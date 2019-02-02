@@ -19,7 +19,6 @@ import sys, os
 
 
 # 주의할 점
-# 뮤직봇의 커맨드를 "노래방재생"을 추가해주세요! 안그럼 따로따로 커맨드를 입력해야하고 싱크가 안맞는 불편함이 있습니다.
 # 한 서버에서 사용하는 것을 권장합니다. 여러서버를 동시에 사용하면 코드가 꼬이게 코딩되어 있습니다.
 # 노래가 재생 중에 !노래방재생 커맨드를 사용하지 마세요! 딜레이 또는 자막이 겹칩니다.
 # 노래방재생을 이용할 때 꼭 링크를 달아주세요! 안그럼 작동을 안합니다!.
@@ -33,13 +32,15 @@ token = "###########################################################"
 
 # 자막이 시작 될 때 싱크가 맞지않다면 수정해주세요 기본 값: 6.5초
 # 영상이 짧거나 길때 약간씩 어긋납니다. 그 점 양해해주세요
-SetFirstSleep = 6.5
+# 사용안함
+#SetFirstSleep = 6.5
 
 # 영상 길이가 짧을 때 영상받아오는 속도가 빠르므로 그 만큼 딜레이를 줘야하기 때문에
 # 사용되는 변수  영상 길이 기본 값: 140초
-SetVideoLength = 140
+# 사용안함
+#SetVideoLength = 140
 
-# 자막 언어 한국어: ko  日本語: ja  English: en
+# 기본 자막 언어 한국어: ko  日本語: ja  English: en
 SetLanguege = "ko"
 
 # 봇 사용 예시입니다.
@@ -79,8 +80,12 @@ def main():
 		global SubNum
 		global NowTime
 		
-		if SubTime[SubNum] == 9999:
-			await app.send_message(channel, "```자막이 없습니다!```")
+		try:
+			if SubTime[SubNum] == 9999:
+				await app.send_message(channel, "```자막이 없습니다!```")
+		except IndexError:
+			await app.send_message(channel, "```자막기능을 사용하지 않습니다.```")
+			
 		SleepTimeFirst = t.time()
 		first1 = True
 		while(True):
@@ -109,7 +114,7 @@ def main():
 					break
 			SleepTimeSecond = t.time()
 			sleepp = SleepTimeSecond - SleepTimeFirst
-			NowTimeDelay = False
+			#NowTimeDelay = False
 			if(sleepp > 1):
 				if(sleepp > 2):
 					sleeptime = int(sleepp) + 1 - sleepp
@@ -126,6 +131,7 @@ def main():
 					sleeptime -= sleepp - 1
 			else:
 				if(first1 == True):
+					sleeptime = 0
 					first1 = False
 				else:
 					sleeptime += 1 - sleepp
@@ -152,14 +158,17 @@ def main():
 	async def on_message(message):
 		global SetLanguege
 		if message.author.bot:
-			return None
+			if message.content.startswith("Now playing in"):
+				await BotSub()
+			else:
+				return None
 		
 		if message.content.startswith("!노래방재생"):
-			global SetFirstSleep
-			global SetVideoLength
-			FirstSleep = SetFirstSleep
+			#global SetFirstSleep
+			#global SetVideoLength
+			#FirstSleep = SetFirstSleep
 			Languege = SetLanguege
-			VideoLength = SetVideoLength
+			#VideoLength = SetVideoLength
 			mecont = message.content
 			mecont2 = mecont.split("v=")
 			url = "https://www.youtube.com/api/timedtext?lang="+ Languege +"&v=" + mecont2[1]
@@ -188,13 +197,13 @@ def main():
 				else:
 					SubText.append(result.string)
 				appendnum += 1
-			if SubTime[appendnum-1] < VideoLength:
-				FirstSleep += 2.5
+			#if SubTime[appendnum-1] < VideoLength:
+			#	FirstSleep += 2.5
 			SubTime.append(9999)
 			SubTime.append(9999)
 			SubTime.append(9999)
-			t.sleep(FirstSleep)
-			await BotSub()
+			#t.sleep(FirstSleep)
+			#await BotSub()
 		if message.content.startswith("!스킵"):
 			ResetBot()
 		if message.content == "!한국어" or message.content == "!korean" or message.content == "!韓国語":
