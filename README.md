@@ -3,7 +3,8 @@
 
 (Youtube caption loading function included)
 
-
+# 주의할점
+뮤직봇의 커맨드를 !노래방재생 으로 바꿔주세요.
 
 SubBot.py를 읽어주세요 :)
 
