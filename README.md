@@ -7,5 +7,5 @@
 
 SubBot.py를 읽어주세요 :)
 
-
+미리보기
 https://www.youtube.com/watch?v=bI1i9bzKrQI
