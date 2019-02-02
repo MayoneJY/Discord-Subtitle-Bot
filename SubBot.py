@@ -131,10 +131,11 @@ def main():
 			print(str(NowTime)+"   "+str(SubTime[SubNum])+"   "+str(SleepTimeFirst)+"   "+str(SleepTimeSecond)+"   "+str(sleeptime))
 			t.sleep(sleeptime)
 			SleepTimeFirst = SleepTimeSecond + sleeptime - 1
-			if(NowTimeDelay == True):
-				NowTimeDelay = False
-			else:
-				NowTime += 1
+			#if(NowTimeDelay == True):
+			#	NowTimeDelay = False
+			#else:
+			#	NowTime += 1
+			NowTime += 1
 
 
 	@app.event
