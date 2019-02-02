@@ -13,8 +13,8 @@ https://www.youtube.com/watch?v=bI1i9bzKrQI
 
 # 커맨드
 
-!노래방재생 <LINK>
-  <LINK>의 유튜브 자막을 불러와 출력해줍니다.
+!노래방재생 &lt;LINK&gt;
+  &lt;LINK&gt;의 유튜브 자막을 불러와 출력해줍니다.
     
     
 !스킵
