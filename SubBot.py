@@ -120,7 +120,7 @@ def main():
 					sleeptime = int(sleepp) + 1 - sleepp
 					printsend = ""
 					for i in range(int(sleepp) - 1):
-						NowTimeDelay = True
+						#NowTimeDelay = True
 						NowTime += 1
 						if NowTime >= SubTime[SubNum-1]:
 							#print("진입" + SubText[SubNum])
