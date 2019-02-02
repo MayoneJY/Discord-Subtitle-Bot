@@ -9,6 +9,7 @@ import sys, os
 
 # 제작자 : 남정연 (mayone6063@naver.com)
 # 수정자 : 
+# 깃허브 : https://github.com/akso6063/Discord-Subtitle-Bot
 
 # 제가 제작한 코드를 사용하시는건 괜찮지만 제작자이름을 지우지 말아주세요 :(
 # 수정은 자유입니다. 제작자 이름만 냅둬주세요.
