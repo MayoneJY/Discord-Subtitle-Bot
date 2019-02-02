@@ -6,3 +6,6 @@
 
 
 SubBot.py를 읽어주세요 :)
+
+
+https://www.youtube.com/watch?v=bI1i9bzKrQI
