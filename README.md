@@ -23,7 +23,7 @@ https://www.youtube.com/watch?v=bI1i9bzKrQI
   
 # !언어변경 &lt;lang_code&gt;
   자막 언어를 변경해주는 커맨드.
-  언어 <link>로 그 영상의 자막 lang_code를 얻을 수 있습니다.
+  !언어 <link>로 그 영상의 자막 lang_code를 얻을 수 있습니다.
   
 # !볼륨
   !볼륨
