@@ -13,7 +13,7 @@ https://www.youtube.com/watch?v=bI1i9bzKrQI
 
 # # 커맨드
 
-# !자막 &lt;LINK&gt , !자막 &lt;TITLE&gt;
+# !자막 &lt;LINK&gt; , !자막 &lt;TITLE&gt;
   &lt;LINK&gt;, &lt;TITLE&gt의 유튜브 재생과 자막을 불러와 출력해줍니다.
     
     
@@ -21,7 +21,7 @@ https://www.youtube.com/watch?v=bI1i9bzKrQI
   음성과 자막출력을 중지합니다.
   
   
-# !언어변경 &lt;lang_code&gt
+# !언어변경 &lt;lang_code&gt;
   자막 언어를 변경해주는 커맨드.
   언어 <link>로 그 영상의 자막 lang_code를 얻을 수 있습니다.
   
