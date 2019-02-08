@@ -14,7 +14,7 @@ https://www.youtube.com/watch?v=bI1i9bzKrQI
 # # 커맨드
 
 # !자막 &lt;LINK&gt; , !자막 &lt;TITLE&gt;
-  &lt;LINK&gt;, &lt;TITLE&gt의 유튜브 재생과 자막을 불러와 출력해줍니다.
+  &lt;LINK&gt;, &lt;TITLE&gt;의 유튜브 재생과 자막을 불러와 출력해줍니다.
     
     
 # !스톱
