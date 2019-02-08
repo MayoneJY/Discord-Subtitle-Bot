@@ -21,6 +21,12 @@ https://www.youtube.com/watch?v=bI1i9bzKrQI
   음성과 자막출력을 중지합니다.
   
   
+# !언어 &lt;LINK&gt;
+  !언어 <link>
+  
+  해당 영상의 자막 언어와 lang_code를 알려주는 커맨드.
+  
+  
 # !언어변경 &lt;lang_code&gt;
   자막 언어를 변경해주는 커맨드.
   
