@@ -11,8 +11,8 @@ from discord.ext import commands
 
 defultvolum = 0.2
 defultvideoSub = "any"
-channel = discord.Object(id='537842350882291734')
-token = "NDE1NDc1NTEzMzU2NzE0MDE0.DzHy7Q.ADQiLT0ny2DLwGQ9Q_bQU3W5Wg0"
+channel = discord.Object(id='##################')
+token = "###########################################################"
 beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
 def ResetBot():
     executable = sys.executable
