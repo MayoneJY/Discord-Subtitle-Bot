@@ -9,10 +9,21 @@ import urllib.request
 import json
 from discord.ext import commands
 
-defultvolum = 0.2
+# 기본 볼륨을 지정해주세요 값은 0.0부터 1.0입니다.
+defultvolum = 0.2 # (20%)
+
+# 자막이 있는 영상만 찾으려면 closedCaption을 자막이 없는영상도 포함하려면 any를 입력해주세요
 defultvideoSub = "any"
+
+# 채널id와 토큰을 입력해주세요.
 channel = discord.Object(id='##################')
 token = "###########################################################"
+
+
+
+
+
+
 beforeArgs = "-reconnect 1 -reconnect_streamed 1 -reconnect_delay_max 5"
 def ResetBot():
     executable = sys.executable
@@ -69,10 +80,10 @@ def main():
             print(voice_client)
             print("들어와")
             if voice_client== None:
-                await app.send_message(message.channel, '들어왔습니다') # 호오.... 나를 부르는건가? 네녀석.. 각오는 되있겠지?
+                await app.send_message(message.channel, '들어왔습니다') 
                 await app.join_voice_channel(channel)
             else:
-                await app.send_message(message.channel, '봇이 이미 들어와있습니다.') # 응 이미 들어와있어 응쓰게싸
+                await app.send_message(message.channel, '봇이 이미 들어와있습니다.')
 
         if message.content.startswith("!나가"):
                 voice_client = app.voice_client_in(server)
@@ -80,10 +91,10 @@ def main():
                 print(voice_client)
                 print("나가")
                 if voice_client == None:
-                    await app.send_message(message.channel,'봇이 음성채널에 접속하지 않았습니다.') # 원래나가있었음 바보녀석 니녀석의 죄는 "어리석음" 이라는 .것.이.다.
+                    await app.send_message(message.channel,'봇이 음성채널에 접속하지 않았습니다.') 
                     pass
                 else:
-                    await app.send_message(message.channel, '나갑니다') # 나가드림
+                    await app.send_message(message.channel, '나갑니다') 
                     await voice_client.disconnect()
         if message.content == "!자막위주":
             servervideosubs[server.id] = "closedCaption"
