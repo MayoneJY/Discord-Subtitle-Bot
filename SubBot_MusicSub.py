@@ -249,6 +249,7 @@ def main():
 				mecont = message.content
 				mecont2 = mecont.split("v=")
 				ytlink = mecont2[1]
+				ytlink = ytlink[0:11]
 				url = "https://www.youtube.com/api/timedtext?lang="+ Languege +"&v=" + ytlink
 			else:
 				Text = ""
@@ -378,6 +379,7 @@ def main():
 			await app.send_message(message.channel, embed=embed)
 		if message.content.startswith("!언어"):
 			url = message.content.split("v=")
+			url = url[0:11]
 			urllist = "https://www.youtube.com/api/timedtext?type=list&v=" + url[1]
 			request = urllib.request.urlopen(urllist)
 			xml = request.read()
