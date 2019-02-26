@@ -121,6 +121,7 @@ def main():
             if msg1[1].startswith("http"):
                 url = msg1[1]
                 urlcode = message.content.split("v=")
+                urlcode = urlcode[0:11]
                 data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/search?q="+ urllib.parse.quote(urlcode[1]) +"&videoCaption=" + servervideosubs[server.id] +"&type=video&part=snippet&key=AIzaSyApEAt-uS8udiAR18kNxl6VVoCSHspsF2o&maxResults=1").read()
                 output = json.loads(data)
             else:
