@@ -47,7 +47,8 @@ token = "###########################################################"
 SetLanguege = "ko"
 
 # 기본볼륨 0.2(20%)
-defaultvolum = 0.2
+# 사용안함
+#defaultvolum = 0.2
 
 # 자막이 있는 영상만 찾으려면 closedCaption을 자막이 없는영상도 포함하려면 any를 입력해주세요
 defaultvideoSub = "any"
@@ -60,6 +61,12 @@ defaultvideoSub = "any"
 # !자막 https://www.youtube.com/watch?v=55AalrbALAk
 # !자막 180도
 # !자막 태보
+# 유튜브api
+# AIzaSyApEAt-uS8udiAR18kNxl6VVoCSHspsF2o
+# https://developers.google.com/apis-explorer/#p/youtube/v3/youtube.search.list?part=snippet&order=viewCount&q=skateboarding+dog&type=video&videoDefinition=high
+# https://www.googleapis.com/youtube/v3/search?q=%ED%83%9C%EB%B3%B4&part=snippet&key=AIzaSyApEAt-uS8udiAR18kNxl6VVoCSHspsF2o&maxResults=2
+
+# 목표 음성지원
 
 cmdlist = '```!커맨드, !명령어, !도움말, !자막, !언어변경, !한국어, !일본어, !영어, !볼륨, !스톱, !자막위주, !자막위주안함```	'
 
@@ -71,6 +78,7 @@ cmdembed = discord.Embed(
 cmdembed.add_field(name='!커맨드, !명령어, !도움말', value="여러 커맨드의 목록과 설명을 알려주는 커맨드.\n", inline=False)
 cmdembed.add_field(name='!자막', value="``!자막 <link>``\n``!자막 <title>``\n유튜브를 틀어주는 커맨드.\n", inline=False)
 cmdembed.add_field(name='!스톱', value="영상을 그만트는 커맨드.", inline=False)
+cmdembed.add_field(name='!언어', value="``!언어 <link>``\n해당 영상의 자막 언어와 lang_code를 알려주는 커맨드.\n", inline=False)
 cmdembed.add_field(name='!언어변경', value="``!언어변경 <lang_code>``\n자막 언어를 변경해주는 커맨드.\n!언어 <link>로 그 영상의 자막 lang_code를 얻을 수 있음.\n", inline=False)
 cmdembed.add_field(name='!한국어, !일본어, !영어', value="자막의 언어를 각 언어로 변경해주는 커맨드.\n", inline=False)
 cmdembed.add_field(name='!볼륨', value="``!볼륨``\n현재 볼륨크기를 알려주는 커맨드.\n``!볼륨 <number>``\n볼륨을 <number>으로 바꿔주는 커맨드. 0~100까지 사용가능하다.\n", inline=False)
@@ -88,6 +96,7 @@ def ResetBot():
     print("재시작 중...")
     os.execvp(executable, args)
 
+playonoffs={}
 servervideosubs={}
 SubTime = []
 SubText = []
@@ -124,7 +133,7 @@ def main():
 
 		SleepTimeFirst = t.time()
 		first1 = True
-		
+		playonoffs[server.id] = True
 		while(True):
 			if msstops[server.id] == True or SubNum == len(SubText) or SubTime[SubNum] == 9999:
 				SubNum = 0
@@ -133,6 +142,7 @@ def main():
 				NowTime = 0
 				msstops[server.id] = False
 				await app.send_message(channel, "``노래방재생 준비 완료!``")
+				playonoffs[server.id] = False
 				break
 			sleeptime = 1
 			if NowTime >= SubTime[SubNum]:
@@ -201,10 +211,11 @@ def main():
 		try: 
 			type(servervideosubs[server.id])
 			type(msstops[server.id])
+			type(playonoffs[server.id])
 		except KeyError:
 			servervideosubs[server.id] = defaultvideoSub
 			msstops[server.id] = False
-
+			playonoffs[server.id] = False
 		if message.author.bot:
 			if message.content.startswith("``재생중 : "):
 				await BotSub(server)
@@ -215,186 +226,202 @@ def main():
 			
 			await app.send_message(message.channel,embed=cmdembed)
 
-		
-		if message.content == "!자막위주":
-			servervideosubs[server.id] = "closedCaption"
-			embed = discord.Embed(
-				title='음악 정보',
-				description="음악 서칭을 자막위주로 변경되었습니다.",
-				colour=discord.Colour.blue()
-			)
-			await app.send_message(message.channel, embed=embed)
-
-		elif message.content == "!자막위주안함":
-			servervideosubs[server.id] = "any"
-			embed = discord.Embed(
-				title='음악 정보',
-				description="음악 서칭을 정확도 위주로 변경되었습니다.",
-				colour=discord.Colour.blue()
-			)
-			await app.send_message(message.channel, embed=embed)
-
-
-		elif message.content.startswith("!자막"):
-			#global SetFirstSleep
-			#global SetVideoLength
-			#FirstSleep = SetFirstSleep
-			Languege = SetLanguege
-			#VideoLength = SetVideoLength
-			
-			mecont = message.content.split(" ")
-			imglink = ""
-			if mecont[1].startswith("http"):
-
-				mecont = message.content
-				mecont2 = mecont.split("v=")
-				ytlink = mecont2[1]
-				ytlink = ytlink[0:11]
-				url = "https://www.youtube.com/api/timedtext?lang="+ Languege +"&v=" + ytlink
-			else:
-				Text = ""
-				for i in range(1, len(mecont)):
-					Text = Text + " " + mecont[i]
-				
-				data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/search?q="+ urllib.parse.quote(Text) + "&videoCaption=" + servervideosubs[server.id] +"&type=video&part=snippet&key=AIzaSyApEAt-uS8udiAR18kNxl6VVoCSHspsF2o&maxResults=1").read()
-				output = json.loads(data)
-				ytlink = output['items'][0]['id']['videoId']
-				imglink = output['items'][0]['snippet']['thumbnails']['high']['url']
-				url = "https://www.youtube.com/api/timedtext?lang="+ Languege +"&v=" + ytlink
-
-
-			request = urllib.request.urlopen(url)
-			xml = request.read()
-			soup = BeautifulSoup(xml,"html.parser")
-			appendnum = 0
-			for result in soup.find_all("text"):
-				appendtime = math.floor(float(result['start']))
-				if appendnum != 0:
-					if appendtime - SubTime[appendnum-1] > 10:
-						for i in range(math.floor(((appendtime - SubTime[appendnum-1]) / 10))-1):
-							SubTime.append(SubTime[appendnum-1]+10)
-							SubText.append(".")
-							appendnum += 1
-				else: 
-					if appendtime > 10:
-						for i in range(math.floor((appendtime / 10))-1):
-							SubTime.append((10 * (i + 1)))
-							SubText.append(".")
-							appendnum += 1
-
-				SubTime.append(appendtime)
-				if result.string == " ":
-					SubText.append(".")
-				else:
-					SubText.append(result.string)
-				appendnum += 1
-			urllistresult = "노래재생 시작전에 !언어변경 <lang_code> (으)로 자막언어를 변경할 수 있습니다.\n/ "
-			urllist = "https://www.youtube.com/api/timedtext?type=list&v=" + ytlink
-			request = urllib.request.urlopen(urllist)
-			xml = request.read()
-			soup = BeautifulSoup(xml,"html.parser")
-			for result in soup.find_all("track"):
-				urllistresult += result['lang_original'] + "[" + result['lang_code'] + "]" +  " / "
-			if SetLanguege == "ko":
-				infolantp = lankr
-			elif SetLanguege == "en":
-				infolantp = lanen
-			elif SetLanguege == "ja":
-				infolantp = lanja
-			else:
-				infolantp = "언어코드(Lang_Code) : " + SetLanguege
-			
-			#print(urllistresult)
-			try:
-				embed = discord.Embed(
-					title='자막 설정',
-					description=infolantp,
-					colour=discord.Colour.blue()
-				)
-				
-				embed.add_field(name='유튜브 링크', value="https://www.youtube.com/watch?v="+ytlink, inline=False)
-				if urllistresult == "노래재생 시작전에 !언어변경 <lang_code> (으)로 자막언어를 변경할 수 있습니다.\n/ ":
-					urllistresult += "자막 없음."
-				embed.add_field(name='자막 목록  lang_original[lang_code]', value=urllistresult, inline=False)
-			
-			except discord.errors.HTTPException:
-				embed = discord.Embed(
-					title='자막 설정',
-					description=infolantp,
-					colour=discord.Colour.blue()
-				)
-				
-				embed.add_field(name='유튜브 링크', value="https://www.youtube.com/watch?v="+ytlink, inline=False)
-			
-				urllistresult = "자막 수가 너무 많아 모두 입력하지 못합니다."
-				embed.add_field(name='자막 목록', value=urllistresult, inline=False)
-			if imglink != "":
-				embed.set_image(url = imglink)
-			await app.send_message(message.channel, embed=embed)
-			#if SubTime[appendnum-1] < VideoLength:
-			#	FirstSleep += 2.5
-			SubTime.append(9999)
-			SubTime.append(9999)
-			SubTime.append(9999)
-			#t.sleep(FirstSleep)
-			#await BotSub()
-
-
 		if message.content.startswith("!스톱"):
 			#ResetBot()
 			msstops[server.id] = True
+			playonoffs[server.id] = False
 
-		if message.content == "!한국어" or message.content == "!korean" or message.content == "!韓国語":
-			SetLanguege = "ko"
+		if message.content == "!재부팅":
+			ResetBot()
+
+
+		if playonoffs[server.id] == True and (message.content!="!재부팅" or message.content!="!스톱" or message.content!="!볼륨"):
 			embed = discord.Embed(
-				title='음악 정보',
-				description=lankr,
+				title='주의!',
+				description="현 커맨드를 사용하시려면 !스톱 커맨드를 먼저 입력후 사용해주세요.",
 				colour=discord.Colour.blue()
 			)
-			await app.send_message(message.channel, embed=embed)
-		if message.content == "!English" or message.content == "!영어" or message.content == "!英語":
-			SetLanguege = "en"
-			embed = discord.Embed(
-				title='음악 정보',
-				description=lanen,
-				colour=discord.Colour.blue()
-			)
-			await app.send_message(message.channel, embed=embed)
-		if message.content == "!日本語" or message.content == "!일본어" or message.content == "!japanese":
-			SetLanguege = "ja"
-			embed = discord.Embed(
-				title='음악 정보',
-				description=lanja,
-				colour=discord.Colour.blue()
-			)
-			await app.send_message(message.channel, embed=embed)
-		if message.content.startswith("!언어변경"):
-			langtext = message.content.split(" ")
-			SetLanguege = langtext[1]
-			embed = discord.Embed(
-				title='음악 정보',
-				description=SetLanguege + "(으)로 변경되었습니다.",
-				colour=discord.Colour.blue()
-			)
-			await app.send_message(message.channel, embed=embed)
-		if message.content.startswith("!언어"):
-			url = message.content.split("v=")
-			url = url[0:11]
-			urllist = "https://www.youtube.com/api/timedtext?type=list&v=" + url[1]
-			request = urllib.request.urlopen(urllist)
-			xml = request.read()
-			soup = BeautifulSoup(xml,"html.parser")
-			urllistresult = ""
-			cnt = 0
-			for result in soup.find_all("track"):
-				urllistresult += result['lang_original'] + "[" + result['lang_code'] + "]" +  " / "
-				cnt += 1
-				if cnt == 20:
-					await app.send_message(message.channel, "``"+urllistresult+"``")
+			#await app.send_message(message.channel, embed=embed)
+		else:
+			if message.content == "!자막위주":
+				servervideosubs[server.id] = "closedCaption"
+				embed = discord.Embed(
+					title='음악 정보',
+					description="음악 서칭을 자막위주로 변경되었습니다.",
+					colour=discord.Colour.blue()
+				)
+				await app.send_message(message.channel, embed=embed)
+
+			elif message.content == "!자막위주안함":
+				servervideosubs[server.id] = "any"
+				embed = discord.Embed(
+					title='음악 정보',
+					description="음악 서칭을 정확도 위주로 변경되었습니다.",
+					colour=discord.Colour.blue()
+				)
+				await app.send_message(message.channel, embed=embed)
+
+
+			elif message.content.startswith("!자막"):
+				#global SetFirstSleep
+				#global SetVideoLength
+				#FirstSleep = SetFirstSleep
+				Languege = SetLanguege
+				#VideoLength = SetVideoLength
+				
+				mecont = message.content.split(" ")
+				imglink = ""
+				if mecont[1].startswith("http"):
+
+					mecont = message.content
+					mecont2 = mecont.split("v=")
+					ytlink = mecont2[1]
+					ytlink = ytlink[0:11]
+					url = "https://www.youtube.com/api/timedtext?lang="+ Languege +"&v=" + ytlink
+				else:
+					Text = ""
+					for i in range(1, len(mecont)):
+						Text = Text + " " + mecont[i]
+					
+					data = urllib.request.urlopen("https://www.googleapis.com/youtube/v3/search?q="+ urllib.parse.quote(Text) + "&videoCaption=" + servervideosubs[server.id] +"&type=video&part=snippet&key=AIzaSyApEAt-uS8udiAR18kNxl6VVoCSHspsF2o&maxResults=1").read()
+					output = json.loads(data)
+					ytlink = output['items'][0]['id']['videoId']
+					imglink = output['items'][0]['snippet']['thumbnails']['high']['url']
+					url = "https://www.youtube.com/api/timedtext?lang="+ Languege +"&v=" + ytlink
+
+
+				request = urllib.request.urlopen(url)
+				xml = request.read()
+				soup = BeautifulSoup(xml,"html.parser")
+				appendnum = 0
+				for result in soup.find_all("text"):
+					appendtime = math.floor(float(result['start']))
+					if appendnum != 0:
+						if appendtime - SubTime[appendnum-1] > 10:
+							for i in range(math.floor(((appendtime - SubTime[appendnum-1]) / 10))-1):
+								SubTime.append(SubTime[appendnum-1]+10)
+								SubText.append(".")
+								appendnum += 1
+					else: 
+						if appendtime > 10:
+							for i in range(math.floor((appendtime / 10))-1):
+								SubTime.append((10 * (i + 1)))
+								SubText.append(".")
+								appendnum += 1
+
+					SubTime.append(appendtime)
+					if result.string == " ":
+						SubText.append(".")
+					else:
+						SubText.append(result.string)
+					appendnum += 1
+				urllistresult = "노래재생 시작전에 !언어변경 <lang_code> (으)로 자막언어를 변경할 수 있습니다.\n/ "
+				urllist = "https://www.youtube.com/api/timedtext?type=list&v=" + ytlink
+				request = urllib.request.urlopen(urllist)
+				xml = request.read()
+				soup = BeautifulSoup(xml,"html.parser")
+				for result in soup.find_all("track"):
+					urllistresult += result['lang_original'] + "[" + result['lang_code'] + "]" +  " / "
+				if SetLanguege == "ko":
+					infolantp = lankr
+				elif SetLanguege == "en":
+					infolantp = lanen
+				elif SetLanguege == "ja":
+					infolantp = lanja
+				else:
+					infolantp = "언어코드(Lang_Code) : " + SetLanguege
+				
+				#print(urllistresult)
+				try:
+					embed = discord.Embed(
+						title='자막 설정',
+						description=infolantp,
+						colour=discord.Colour.blue()
+					)
+					
+					embed.add_field(name='유튜브 링크', value="https://www.youtube.com/watch?v="+ytlink, inline=False)
+					if urllistresult == "노래재생 시작전에 !언어변경 <lang_code> (으)로 자막언어를 변경할 수 있습니다.\n/ ":
+						urllistresult += "자막 없음."
+					embed.add_field(name='자막 목록  lang_original[lang_code]', value=urllistresult, inline=False)
+				
+				except discord.errors.HTTPException:
+					embed = discord.Embed(
+						title='자막 설정',
+						description=infolantp,
+						colour=discord.Colour.blue()
+					)
+					
+					embed.add_field(name='유튜브 링크', value="https://www.youtube.com/watch?v="+ytlink, inline=False)
+				
+					urllistresult = "자막 수가 너무 많아 모두 입력하지 못합니다."
+					embed.add_field(name='자막 목록', value=urllistresult, inline=False)
+				if imglink != "":
+					embed.set_image(url = imglink)
+				await app.send_message(message.channel, embed=embed)
+				#if SubTime[appendnum-1] < VideoLength:
+				#	FirstSleep += 2.5
+				SubTime.append(9999)
+				SubTime.append(9999)
+				SubTime.append(9999)
+				#t.sleep(FirstSleep)
+				#await BotSub()
+
+
+
+			if message.content == "!한국어" or message.content == "!korean" or message.content == "!韓国語":
+				SetLanguege = "ko"
+				embed = discord.Embed(
+					title='음악 정보',
+					description=lankr,
+					colour=discord.Colour.blue()
+				)
+				await app.send_message(message.channel, embed=embed)
+			if message.content == "!English" or message.content == "!영어" or message.content == "!英語":
+				SetLanguege = "en"
+				embed = discord.Embed(
+					title='음악 정보',
+					description=lanen,
+					colour=discord.Colour.blue()
+				)
+				await app.send_message(message.channel, embed=embed)
+			if message.content == "!日本語" or message.content == "!일본어" or message.content == "!japanese":
+				SetLanguege = "ja"
+				embed = discord.Embed(
+					title='음악 정보',
+					description=lanja,
+					colour=discord.Colour.blue()
+				)
+				await app.send_message(message.channel, embed=embed)
+			if message.content.startswith("!언어변경"):
+				langtext = message.content.split(" ")
+				SetLanguege = langtext[1]
+				embed = discord.Embed(
+					title='음악 정보',
+					description=SetLanguege + "(으)로 변경되었습니다.",
+					colour=discord.Colour.blue()
+				)
+				await app.send_message(message.channel, embed=embed)
+			if message.content.startswith("!언어"):
+				try:
+					url = message.content.split("v=")
+					url = url[0:11]
+					urllist = "https://www.youtube.com/api/timedtext?type=list&v=" + url[1]
+					request = urllib.request.urlopen(urllist)
+					xml = request.read()
+					soup = BeautifulSoup(xml,"html.parser")
 					urllistresult = ""
 					cnt = 0
-			
-			await app.send_message(message.channel, "``"+urllistresult+"``")
+					for result in soup.find_all("track"):
+						urllistresult += result['lang_original'] + "[" + result['lang_code'] + "]" +  " / "
+						cnt += 1
+						if cnt == 20:
+							await app.send_message(message.channel, "``"+urllistresult+"``")
+							urllistresult = ""
+							cnt = 0
+					
+					await app.send_message(message.channel, "``"+urllistresult+"``")
+				except IndexError:
+					await app.send_message(message.channel, "``온전하지 않은 명령입니다.``")
 
 	app.run(token)
 	ResetBot()
