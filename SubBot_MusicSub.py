@@ -235,7 +235,7 @@ def main():
 			ResetBot()
 
 
-		if playonoffs[server.id] == True and (message.content!="!재부팅" or message.content!="!스톱" or message.content!="!볼륨"):
+		if playonoffs[server.id] == True and message.content.startswith("!") and (message.content!="!재부팅" or message.content!="!스톱" or not message.content.startswith("!볼륨")):
 			embed = discord.Embed(
 				title='주의!',
 				description="현 커맨드를 사용하시려면 !스톱 커맨드를 먼저 입력후 사용해주세요.",
@@ -365,6 +365,7 @@ def main():
 				SubTime.append(9999)
 				#t.sleep(FirstSleep)
 				#await BotSub()
+				print(servervideosubs[server.id])
 
 
 
