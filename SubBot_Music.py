@@ -39,18 +39,20 @@ players={}
 volumes={}
 imgurls={}
 servervideosubs={}
-def check_queue(id):
-    playonoffs[id] = False
-    if queues[id]!=[]:
-        player = queues[id].pop(0)
-        players[id] = player
-        del musiclist[0]
-        player.volume = volumes[id]
-        player.start()
 
 def main():
     app = discord.Client()
 
+    async def check_queue(id):
+        playonoffs[id] = False
+        await app.send_message(channel, "``음악재생 준비 완료``")
+        if queues[id]!=[]:
+            player = queues[id].pop(0)
+            players[id] = player
+            del musiclist[0]
+            player.volume = volumes[id]
+            player.start()
+            
     @app.event
     async def on_ready():
         print("다음으로 로그인합니다 : ")
@@ -110,7 +112,7 @@ def main():
 
 
 
-        if playonoffs[server.id] == True and (message.content!="!재부팅" or message.content!="!스톱" or message.content!="!볼륨"):
+        if playonoffs[server.id] == True and message.content.startswith("!") and (message.content!="!재부팅" or message.content!="!스톱" or not message.content.startswith("!볼륨")):
             embed = discord.Embed(
                 title='주의!',
                 description="현 커맨드를 사용하시려면 !스톱 커맨드를 먼저 입력후 사용해주세요.",
