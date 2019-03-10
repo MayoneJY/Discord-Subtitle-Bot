@@ -39,20 +39,19 @@ players={}
 volumes={}
 imgurls={}
 servervideosubs={}
+def check_queue(id):
+    playonoffs[id] = False
+    if queues[id]!=[]:
+        player = queues[id].pop(0)
+        players[id] = player
+        del musiclist[0]
+        player.volume = volumes[id]
+        player.start()
 
 def main():
     app = discord.Client()
 
-    async def check_queue(id):
-        playonoffs[id] = False
-        await app.send_message(channel, "``음악재생 준비 완료``")
-        if queues[id]!=[]:
-            player = queues[id].pop(0)
-            players[id] = player
-            del musiclist[0]
-            player.volume = volumes[id]
-            player.start()
-            
+
     @app.event
     async def on_ready():
         print("다음으로 로그인합니다 : ")
@@ -61,6 +60,7 @@ def main():
         print("==========================")
         await app.send_message(channel, "``음악재생 준비 완료``")
         #await app.change_presence(game=discord.Game(name="!음악 테스트",type=1))
+
 
     @app.event
     async def on_message(message):
