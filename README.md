@@ -3,59 +3,41 @@
 
 (Youtube caption loading function included)
 
-# 주의할점
-SubBot.py 를 사용하지 마시고
-
-SubBot_Music.py 과 SubBot_MusicSub.py 를 같이 사용해주세요.
+봇 추가 링크:
+http://mayonedev.com/discordBot/
 
 미리보기
-https://www.youtube.com/watch?v=bI1i9bzKrQI
+https://www.youtube.com/watch?v=KJWaL7X2tgU
 
 # # 커맨드
 
-# !자막 &lt;LINK&gt; , !자막 &lt;TITLE&gt;
+# /재생 &lt;LINK&gt; , /재생 &lt;TITLE&gt;
   &lt;LINK&gt;, &lt;TITLE&gt;의 유튜브 재생과 자막을 불러와 출력해줍니다.
     
     
-# !스톱
+# /정지
   음성과 자막출력을 중지합니다.
+
+# /스킵
+  현재 재생 중인 오디오를 정지시킨 뒤 다음 재생목록을 재생합니다.
   
-  
-# !언어 &lt;LINK&gt;
-  !언어 <link>
-  
-  해당 영상의 자막 언어와 lang_code를 알려주는 커맨드.
-  
-  
-# !언어변경 &lt;lang_code&gt;
-  자막 언어를 변경해주는 커맨드.
-  
-  !언어 &lt;link&gt;로 그 영상의 자막 lang_code를 얻을 수 있습니다.
-  
-# !볼륨
-  !볼륨
+# /재생목록
+  서버에 저장된 재생목록을 띄어줍니다.
+
+
+# /일시정지
+  오디오를 일시정지합니다. 
+
+# /다시재생
+  일시정지한 오디오를 다시 재생합니다.
+
+# /볼륨
+  /볼륨
   
   현재 볼륨크기를 알려주는 커맨드.
   
   
-  !볼륨 <number>
+  /볼륨 <number>
   
   볼륨을 <number>으로 바꿔주는 커맨드. 0~100까지 사용가능합니다.
   
-# !자막위주
-  자막영상위주로 서칭하는 커맨드.
-  
-# !자막위주안함
-  정확도위주로 서칭하는 커맨드.
-  
-# !정보
-  마지막으로 추가된 영상의 정보를 알려주는 커맨드.
-  
-# !한국어, !韓国語, !korean
-  유튜브 자막언어를 한국어로 지정합니다.
-  
-# !영어, !英語, !english
-  유튜브 자막언어를 영어로 지정합니다.
-
-# !일본어, !日本語, !japanese
-  유튜브 자막언어를 일본어로 지정합니다.
