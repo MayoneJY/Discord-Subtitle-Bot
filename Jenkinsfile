@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        DISCORD_BOT_TOKEN = credentials('DISCORD_BOT_TOKEN'),
-        DISCORD_BOT_AUTHOR_ID = credentials('DISCORD_BOT_AUTHOR_ID'),
+        DISCORD_BOT_TOKEN = credentials('DISCORD_BOT_TOKEN')
+        DISCORD_BOT_AUTHOR_ID = credentials('DISCORD_BOT_AUTHOR_ID')
         DISCORD_BOT_NOTICE_CHANNEL_ID = credentials('DISCORD_BOT_NOTICE_CHANNEL_ID')
     }
 
