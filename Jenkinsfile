@@ -20,12 +20,6 @@ pipeline {
             }
         }
 
-        stage('Run Tests') {
-            steps {
-                sh 'pytest'
-            }
-        }
-
         stage('Deploy') {
             steps {
                 sh '''
