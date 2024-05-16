@@ -8,26 +8,36 @@ pipeline {
     }
 
     stages {
-        stage('Clone') {
+        stage('Setup Workspace') {
             steps {
-                git branch: 'test', url: 'https://github.com/MayoneJY/Discord-Subtitle-Bot.git'
+                script {
+                    sh "git config --global --add safe.directory '/media/usb1/jenkins/workspace/${ITEM_FULL_NAME}'"
+                }
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                sh 'pip install -r requirements.txt'
+        stages {
+            stage('Clone') {
+                steps {
+                    git branch: 'test', url: 'https://github.com/MayoneJY/Discord-Subtitle-Bot.git'
+                }
             }
-        }
 
-        stage('Deploy') {
-            steps {
-                sh '''
-                export DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-                export DISCORD_BOT_AUTHOR_ID=${DISCORD_BOT_AUTHOR_ID}
-                export DISCORD_BOT_NOTICE_CHANNEL_ID=${DISCORD_BOT_NOTICE_CHANNEL_ID}
-                nohup python bot.py > bot.log 2>&1 &
-                '''
+            stage('Install Dependencies') {
+                steps {
+                    sh 'pip install -r requirements.txt'
+                }
+            }
+
+            stage('Deploy') {
+                steps {
+                    sh '''
+                    export DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+                    export DISCORD_BOT_AUTHOR_ID=${DISCORD_BOT_AUTHOR_ID}
+                    export DISCORD_BOT_NOTICE_CHANNEL_ID=${DISCORD_BOT_NOTICE_CHANNEL_ID}
+                    nohup python bot.py > bot.log 2>&1 &
+                    '''
+                }
             }
         }
     }
