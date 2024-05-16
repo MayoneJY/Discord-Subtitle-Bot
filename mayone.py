@@ -7,7 +7,7 @@ from datetime import datetime
 from traceback import format_exception
 from dotenv import load_dotenv
 import os
-# test
+
 load_dotenv()
 
 intents = discord.Intents.all()
