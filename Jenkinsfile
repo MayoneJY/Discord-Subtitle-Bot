@@ -8,14 +8,6 @@ pipeline {
     }
 
     stages {
-        stage('Setup Workspace') {
-            steps {
-                script {
-                    sh "git config --global --add safe.directory '/media/usb1/jenkins/workspace/${ITEM_FULL_NAME}'"
-                }
-            }
-        }
-
         stage('Clone') {
             steps {
                 git branch: 'test', url: 'https://github.com/MayoneJY/Discord-Subtitle-Bot.git'
