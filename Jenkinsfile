@@ -7,6 +7,10 @@ pipeline {
         DISCORD_BOT_NOTICE_CHANNEL_ID = credentials('DISCORD_BOT_NOTICE_CHANNEL_ID')
     }
 
+    options {
+        dir('/media/usb1/jenkins/workspace') // 전역적으로 워크스페이스 경로 설정
+    }
+
     stages {
         stage('Clone') {
             steps {
