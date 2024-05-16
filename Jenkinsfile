@@ -26,7 +26,7 @@ pipeline {
                 export DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
                 export DISCORD_BOT_AUTHOR_ID=${DISCORD_BOT_AUTHOR_ID}
                 export DISCORD_BOT_NOTICE_CHANNEL_ID=${DISCORD_BOT_NOTICE_CHANNEL_ID}
-                nohup python3 mayone.py &
+                nohup python bot.py > bot.log 2>&1 &
                 '''
             }
         }

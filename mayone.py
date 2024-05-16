@@ -95,4 +95,8 @@ async def on_application_command_error(ctx, error):
 
 
 #app.remove_command("help")
-app.run(token)
+
+try: 
+    app.run(token)
+except Exception as e:
+    print(f'Error: {e}')
