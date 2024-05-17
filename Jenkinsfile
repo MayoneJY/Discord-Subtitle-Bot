@@ -23,7 +23,7 @@ pipeline {
         stage('Deploy') {
             steps {
                 sh '''
-                pkill -f mayone.py || true
+                pkill -f 'python3 ./mayone.py' || true
                 export DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
                 export DISCORD_BOT_AUTHOR_ID=${DISCORD_BOT_AUTHOR_ID}
                 export DISCORD_BOT_NOTICE_CHANNEL_ID=${DISCORD_BOT_NOTICE_CHANNEL_ID}
