@@ -24,10 +24,10 @@ pipeline {
             steps {
                 sh '''
                 pkill -f 'python3 ./mayone.py' || true
-                sudo -u mayone export DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
-                sudo -u mayone export DISCORD_BOT_AUTHOR_ID=${DISCORD_BOT_AUTHOR_ID}
-                sudo -u mayone export DISCORD_BOT_NOTICE_CHANNEL_ID=${DISCORD_BOT_NOTICE_CHANNEL_ID}
-                sudo -u mayone nohup python3 ./mayone.py > bot.log 2>&1 &
+                export DISCORD_BOT_TOKEN=${DISCORD_BOT_TOKEN}
+                export DISCORD_BOT_AUTHOR_ID=${DISCORD_BOT_AUTHOR_ID}
+                export DISCORD_BOT_NOTICE_CHANNEL_ID=${DISCORD_BOT_NOTICE_CHANNEL_ID}
+                sudo -E -u mayone nohup python3 ./mayone.py > bot.log 2>&1 &
                 '''
             }
         }
