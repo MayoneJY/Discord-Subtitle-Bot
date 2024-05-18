@@ -9,7 +9,7 @@ from dotenv import load_dotenv
 import os
 
 load_dotenv()
-
+# test
 intents = discord.Intents.all()
 app = discord.Bot()
 token = os.getenv('DISCORD_BOT_TOKEN')
