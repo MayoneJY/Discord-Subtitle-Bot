@@ -30,12 +30,26 @@ ytdl_format_options = {
     'default_search': 'auto',
     'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
+ytdl_format_options2 = {
+    'writethumbnail' : True,
+    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
+    'restrictfilenames': True,
+    'noplaylist': True,
+    'nocheckcertificate': True,
+    'ignoreerrors': False,
+    'logtostderr': False,
+    'quiet': True,
+    'no_warnings': True,
+    'default_search': 'auto',
+    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
+}
 
 ffmpeg_options = {
     'options': '-vn'
 }
 
 ydl = YoutubeDL(ytdl_format_options)
+ydl2 = YoutubeDL(ytdl_format_options)
 
 def setup(app):
     app.add_cog(Core(app))
@@ -83,7 +97,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_title(cls, ctx, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl.extract_info(f"ytsearch5:{url}", download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
 
         if 'entries' in data:
             # take first item from a playlist
