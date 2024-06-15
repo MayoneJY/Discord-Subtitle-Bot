@@ -30,19 +30,11 @@ ytdl_format_options = {
     'default_search': 'auto',
     'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
-ytdl_format_options2 = {
-    'extract_flat': True,
-    'writethumbnail' : True,
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
+ydl_opts = {
+    'default_search': 'ytsearch',  # YouTube 검색 모드
+    'quiet': True,                # 출력 최소화
+    'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
+    'noplaylist': True,           # 플레이리스트 제외
 }
 
 ffmpeg_options = {
@@ -50,7 +42,7 @@ ffmpeg_options = {
 }
 
 ydl = YoutubeDL(ytdl_format_options)
-ydl2 = YoutubeDL(ytdl_format_options)
+ydl2 = YoutubeDL(ydl_opts)
 
 def setup(app):
     app.add_cog(Core(app))
@@ -98,7 +90,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_title(cls, ctx, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"--flat-playlist ytsearch5:{url}", download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info("ytsearch5:{url}", download=stream))
         ctx.send(data)
         if 'entries' in data:
             # take first item from a playlist
