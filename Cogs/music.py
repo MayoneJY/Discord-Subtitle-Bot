@@ -93,7 +93,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
     async def from_title(cls, ctx, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
-        ctx.send(data)
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries']
