@@ -128,7 +128,7 @@ class Music():
         has_subtitles = False
         f_t = tt.time()
         with Session() as session:
-            print(info.get('subtitles', {}))
+            print(len(info.get('subtitles', {})))
             for k, subtitles_list in info.get('subtitles', {}).items():
                 if '-' in k and len(k.split('-')[1]) > 2:
                     continue
