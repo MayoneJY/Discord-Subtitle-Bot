@@ -29,7 +29,7 @@ class SearchView(View):
     async def embed(self):
         embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{self.data[self.page*2]}/hqdefault.jpg")
-        self.msg.edit(view=self, embed=embed)
+        await self.msg.edit(view=self, embed=embed)
 
     async def prev(self, interaction):
         await interaction.response.defer()
