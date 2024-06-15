@@ -114,7 +114,10 @@ class Music():
             except Exception as e:
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
             self.player.append(data)
-        await test.delete()
+        try:
+            await test.delete()
+        except:
+            pass
         await ctx.send("재생목록에 추가되었습니다.", delete_after=5)
         if not self.playing:
             await self.play(ctx)
