@@ -135,7 +135,7 @@ class Music():
         data = await YTDLSource.from_title(ctx, query)
         if data == 1:
             return
-        embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={self.data[0]}")
+        embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
         await ctx.send(View=SearchView(data), embed=embed)
 
