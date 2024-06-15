@@ -360,7 +360,8 @@ class Core(commands.Cog, name="뮤직봇"):
 
         # URL이 아닐 경우
         if not url.startswith("http"):
-            pass
+            await guilds[ctx.guild.id].search(ctx, url)
+            return
         # 잘못된 URL
         elif not url.startswith("https://www.youtube.com/watch?v=") or \
             not url.startswith("https://youtu.be/") or \
