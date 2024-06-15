@@ -8,6 +8,7 @@ import json
 import time as tt
 from requests import Session
 import re
+from utils.error import CustomError
 
 guilds = {}
 
@@ -96,6 +97,7 @@ class Music():
     async def queue(self, ctx, url):
         test = await ctx.send("로딩중...")
         check_player = False
+        
         for p in self.player:
             if p.data.get('webpage_url').split("v=")[1] == url.split("v=")[1].split("&")[0]:
                 check_player = True
@@ -103,8 +105,14 @@ class Music():
                 self.subtitles.append(subtitle for subtitle in self.subtitles if subtitle['title'] == p.title)
                 break
         if not check_player:
-            data = await self.loop.run_in_executor(None, YTDLSource.from_url, url)
-            await self.import_subtitles(data.data)
+            try:
+                data = await self.loop.run_in_executor(None, YTDLSource.from_url, url)
+            except Exception as e:
+                raise CustomError(f"다운로드 중 오류가 발생했습니다. {e}")
+            try:
+                await self.import_subtitles(data.data)
+            except Exception as e:
+                raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
             self.player.append(data)
         await test.delete()
         await ctx.send("재생목록에 추가되었습니다.", delete_after=5)
