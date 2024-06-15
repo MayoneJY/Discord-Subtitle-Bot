@@ -53,10 +53,11 @@ class SearchView(View):
 
     async def add(self, interaction):
         await interaction.response.defer()
-        self.music.queue(self.ctx, f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
+        await self.music.queue(self.ctx, f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
+        await self.msg.delete()
 
     async def cancel(self, interaction):
         await interaction.response.defer()
-        await interaction.send("cancel")
+        await self.msg.delete()
 
         
