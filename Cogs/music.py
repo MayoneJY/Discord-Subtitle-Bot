@@ -1,6 +1,7 @@
 from discord.ext import commands
 from discord.commands import slash_command, Option
 from discord.ui import Select, View, Button
+from discord import Embed
 import discord
 from yt_dlp import YoutubeDL
 import asyncio
@@ -9,6 +10,7 @@ import time as tt
 from requests import Session
 import re
 from utils.error import CustomError
+from utils.view import SearchView
 
 guilds = {}
 
@@ -133,10 +135,9 @@ class Music():
         data = await YTDLSource.from_title(ctx, query)
         if data == 1:
             return
-        embed = discord.Embed(title="검색 결과", description="검색 결과입니다.", color=0x00ff00)
-        for i in range(0, len(data), 2):
-            embed.add_field(name=f"{i//2+1}. {data[i+1]}", value=f"https://www.youtube.com/watch?v={data[i]}", inline=False)
-        await ctx.send(embed=embed)
+        embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
+        embed.set_image(url=f"https://i.ytimg.com/vi/{self.data[self.page*2]}/hqdefault.jpg")
+        await ctx.send(View=SearchView(data), embed=embed)
 
     async def queue(self, ctx, url):
         test = await ctx.send("로딩중...")
