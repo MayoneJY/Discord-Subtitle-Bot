@@ -302,15 +302,26 @@ class Core(commands.Cog, name="뮤직봇"):
 
     @slash_command(name="play", description="음악을 재생합니다.", guild_ids=guild_ids)
     async def play(self, ctx, url: str):
-        if ctx.voice_client is None:
-            await ctx.send("음성 채널에 먼저 들어가주세요.")
-            return
         
         if not guilds.get(ctx.guild.id):
             guilds[ctx.guild.id] = Music(self.loop)
 
         await guilds[ctx.guild.id].queue(ctx, url)
         
+    
+    @play.before_invoke
+    async def ensure_voice(self, ctx):
+        if ctx.author.voice and ctx.author.voice.channel:  # 채널에 들어가 있는지 파악
+            # 봇이 다른 음성채널에 들어가 있고, 유저와 같은 채널이 아닐 경우
+            if ctx.voice_client and ctx.voice_client.channel and ctx.voice_client.channel != ctx.author.voice.channel:
+                await ctx.voice_client.move_to(ctx.author.voice.channel)
+                await ctx.respond("음성채널을 옮겼습니다.", delete_after=5)
+            elif not ctx.voice_client:  # 봇이 음성채널에 없을 경우
+                channel = ctx.author.voice.channel  # 채널 구하기
+                await channel.connect()  # 채널 연결
+                await ctx.respond("봇이 음성채널에 입장했습니다.", delete_after=5)
+        else:  # 유저가 채널에 없으면
+            await ctx.respond("음성채널에 연결되지 않았습니다.", delete_after=5)  # 출력
     # @commands.Cog.listener()
     # async def check_guilds(self, ctx):
     #     if not guilds.get(ctx.guild.id):
