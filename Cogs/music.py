@@ -37,7 +37,7 @@ ytdl_format_options2 = {
     'restrictfilenames': True,
     'noplaylist': True,
     'nocheckcertificate': True,
-    'ignoreerrors': True,
+    'ignoreerrors': False,
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True,
@@ -98,8 +98,8 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_title(cls, ctx, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
-
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"--flat-playlist ytsearch5:{url}", download=stream))
+        ctx.send(data)
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries']
