@@ -31,6 +31,7 @@ ytdl_format_options = {
     'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 ytdl_format_options2 = {
+    'extract_flat': True,
     'writethumbnail' : True,
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
@@ -97,7 +98,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_title(cls, ctx, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"--flat-playlist ytsearch5:{url}", download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
 
         if 'entries' in data:
             # take first item from a playlist
