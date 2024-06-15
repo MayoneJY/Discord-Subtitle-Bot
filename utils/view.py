@@ -12,8 +12,8 @@ class SearchView(View):
 
         self.button_prev = Button(style=ButtonStyle.primary, label="이전", custom_id="prev", emoji="⬅️")
         self.button_next = Button(style=ButtonStyle.primary, label="다음", custom_id="next", emoji="➡️")
-        self.button_add = Button(style=ButtonStyle.green, label="추가", custom_id="add", emoji=":heavy_plus_sign:")
-        self.button_cancel = Button(style=ButtonStyle.red, label="취소", custom_id="cancel", emoji=":heavy_multiplication_x:")
+        self.button_add = Button(style=ButtonStyle.green, label="추가", custom_id="add", emoji="⤴️")
+        self.button_cancel = Button(style=ButtonStyle.red, label="취소", custom_id="cancel", emoji="⤵️")
 
         self.button_prev.callback = self.prev
         self.button_next.callback = self.next
