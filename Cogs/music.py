@@ -79,7 +79,35 @@ class YTDLSource(discord.PCMVolumeTransformer):
     #     filename = data['url'] if stream else ydl.prepare_filename(data)
 
     #     return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-        
+
+    @classmethod
+    async def from_title(cls, ctx, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ydl.extract_info(f"ytsearch5:{url}", download=stream))
+
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries']
+        if data == []:
+            await ctx.send("``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
+            return 1
+        else:
+            data2 = []
+            data2.append(data[0]['id'])
+            data2.append(data[0]['title'])
+            try:
+                if len(data[0]) >= 5:
+                    for i in range(1, 5):
+                        data2.append(data[i]['id'])
+                        data2.append(data[i]['title'])
+                else:
+                    for i in range(1, len(data[0])):
+                        data2.append(data[i]['id'])
+                        data2.append(data[i]['title'])
+            except:
+                pass
+
+            return data2
 
 class Music():
     def __init__(self, loop):
@@ -93,6 +121,15 @@ class Music():
         self.player = [] # 음악 플레이어 - discord.FFmpegPCMAudio
         self.volume = 0.1 # 볼륨
         self.now_time = 0 # 현재 재생 시간
+
+    async def search(self, ctx, query):
+        data = await YTDLSource.from_title(ctx, query)
+        if data == 1:
+            return
+        embed = discord.Embed(title="검색 결과", description="검색 결과입니다.", color=0x00ff00)
+        for i in range(0, len(data), 2):
+            embed.add_field(name=f"{i//2+1}. {data[i+1]}", value=f"https://www.youtube.com/watch?v={data[i]}", inline=False)
+        await ctx.send(embed=embed)
 
     async def queue(self, ctx, url):
         test = await ctx.send("로딩중...")
@@ -318,6 +355,20 @@ class Core(commands.Cog, name="뮤직봇"):
         
         if not guilds.get(ctx.guild.id):
             guilds[ctx.guild.id] = Music(self.loop)
+
+
+
+        # URL이 아닐 경우
+        if not url.startswith("http"):
+            pass
+        # 잘못된 URL
+        elif not url.startswith("https://www.youtube.com/watch?v=") or \
+            not url.startswith("https://youtu.be/") or \
+            not url.startswith("https://youtube.com/watch?v=") or \
+            not url.startswith("https://music.youtube.com/watch?v=") or \
+            not url.startswith("https://m.youtube.com/watch?v=") or \
+            not url.startswith("https://www.youtube.com/playlist?list="):
+            raise CustomError("유튜브 URL이 아닙니다.")
 
         await guilds[ctx.guild.id].queue(ctx, url)
         
