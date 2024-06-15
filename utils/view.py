@@ -3,15 +3,17 @@ from discord.ui.button import ButtonStyle
 from discord import Embed
 
 class SearchView(View):
-    def __init__(self, data):
+    def __init__(self, ctx, data, music):
         super().__init__(timeout=None)
         self.page = 0
+        self.ctx = ctx
         self.data = data
+        self.music = music
 
         self.button_prev = Button(style=ButtonStyle.primary, label="이전", custom_id="prev", emoji="⬅️")
         self.button_next = Button(style=ButtonStyle.primary, label="다음", custom_id="next", emoji="➡️")
-        self.button_add = Button(style=ButtonStyle.green, label="추가", custom_id="add", emoji="➕")
-        self.button_cancel = Button(style=ButtonStyle.red, label="취소", custom_id="cancel", emoji="❌")
+        self.button_add = Button(style=ButtonStyle.green, label="추가", custom_id="add", emoji="✚")
+        self.button_cancel = Button(style=ButtonStyle.red, label="취소", custom_id="cancel", emoji="X")
 
         self.button_prev.callback = self.prev
         self.button_next.callback = self.next
@@ -51,7 +53,7 @@ class SearchView(View):
 
     async def add(self, interaction):
         await interaction.response.defer()
-        await interaction.send("add")
+        self.music.queue(self.ctx, f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
 
     async def cancel(self, interaction):
         await interaction.response.defer()

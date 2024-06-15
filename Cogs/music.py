@@ -136,7 +136,7 @@ class Music():
             return
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
-        view = SearchView(data)
+        view = SearchView(ctx, data, self)
         msg = await ctx.send(view=view, embed=embed)
         view.init(msg)
 
