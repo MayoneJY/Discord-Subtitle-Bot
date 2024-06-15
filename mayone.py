@@ -1,6 +1,7 @@
 import asyncio
 import discord
 from discord.ext import commands,tasks
+from discord.errors import DiscordException
 from itertools import cycle
 import os #1
 from datetime import datetime
@@ -81,6 +82,11 @@ async def on_application_command_error(ctx, error):
         embed.add_field(name="상세", value=f"```{error}```", inline=False)
 
         await ctx.send(embed=embed)
+    elif isinstance(error, DiscordException):
+        if str(error).startswith("CustomError: "):
+            embed = discord.Embed(color=0xFE676E)
+            embed.add_field(name="오류 발생", value=f"{str(error).split('CustomError: ')[1]}")
+            await ctx.send(embed=embed)
     else:
 
         embed = discord.Embed(title="오류!!", description="오류가 발생했습니다.", color=0xFF0000)
