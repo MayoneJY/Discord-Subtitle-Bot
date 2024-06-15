@@ -97,7 +97,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_title(cls, ctx, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url} --skip-download", download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url} --flat-playlist", download=stream))
 
         if 'entries' in data:
             # take first item from a playlist
