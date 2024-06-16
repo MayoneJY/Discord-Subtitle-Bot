@@ -243,6 +243,7 @@ class Music():
             subtitle_change = True
             message = ""
             subtitle_current_lang = self.subtitles_language
+            print(current_subtitles)
             subtitle = next((None if current_subtitles else sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
             # await asyncio.sleep(5)
             first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
