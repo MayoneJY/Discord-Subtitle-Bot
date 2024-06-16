@@ -221,78 +221,80 @@ class Music():
         
         self.playing = True
         while self.current < len(self.player):
-            self.subtitles_index = 0
-            self.now_time = 0
-            ctx.voice_client.play(self.player[self.current])
+            try:
+                self.subtitles_index = 0
+                self.now_time = 0
+                ctx.voice_client.play(self.player[self.current])
 
-            current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == self.player[self.current].title), None)
-            # 재생 중인 음악 정보 출력
-            embedtitle = discord.Embed(title=self.player[self.current].title, url=self.player[self.current].data.get('webpage_url'))
-            embedtitle.set_author(name="현재 재생중~")
-            embedtitle.set_image(url=self.player[self.current].data.get('thumbnail'))
-            embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
-            # 다음곡
-            if self.current + 1 < len(self.player):
-                embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
-            else:
-                embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
-            sendmessage = await ctx.send(embed=embedtitle)
-
-
-
-            subtitle_change = True
-            message = ""
-            subtitle_current_lang = self.subtitles_language
-            print(f".{current_subtitles}.")
-            subtitle = next((None if current_subtitles else sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
-            # await asyncio.sleep(5)
-            first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
-            self.now_time = first_time - 1
-
-            while ctx.voice_client.is_playing(): # 음악이 재생중일 때
-                if ctx.voice_client.is_paused(): # 음악이 일시정지 상태일 때
-                    await asyncio.sleep(0.1) 
-                    continue
-                time = tt.time() - self.now_time
-                for i in range(self.subtitles_index, len(subtitle['subtitles'])):
-                    if time >= subtitle['subtitles'][i]['time']:
-                        self.subtitles_index += 1
-                        subtitle_change = True
-                        break
-
-                embedtitle.remove_field(0)
-                embedtitle.remove_field(0)
+                current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == self.player[self.current].title), None)
+                # 재생 중인 음악 정보 출력
+                embedtitle = discord.Embed(title=self.player[self.current].title, url=self.player[self.current].data.get('webpage_url'))
+                embedtitle.set_author(name="현재 재생중~")
+                embedtitle.set_image(url=self.player[self.current].data.get('thumbnail'))
                 embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
                 # 다음곡
                 if self.current + 1 < len(self.player):
                     embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
+                sendmessage = await ctx.send(embed=embedtitle)
 
-                # 자막 출력
-                if subtitle:
-                    if current_subtitles and subtitle_change:
-                        subtitle_change = False
-                        print("change")
-                        
 
-                        # TODO: 자막 언어 바뀔 때만 작동하도록 수정
-                        if subtitle_current_lang != self.subtitles_language:
-                            self.subtitles_language = subtitle_current_lang
-                            subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
-                        
-                        embedtitle.remove_field(2)
-                        message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
 
-                        if len(subtitle['subtitles']) > self.subtitles_index + 1:
-                            message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
-                        else:
-                            message += "```brainfuck\n End \n ```"
-                        embedtitle.add_field(name="자막", value=message, inline=False)
-                        await sendmessage.edit(embed=embedtitle)
-                
-                await asyncio.sleep(0.5)
+                subtitle_change = True
+                message = ""
+                subtitle_current_lang = self.subtitles_language
+                print(f".{current_subtitles}.")
+                subtitle = next((None if current_subtitles else sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
+                # await asyncio.sleep(5)
+                first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
+                self.now_time = first_time - 1
 
+                while ctx.voice_client.is_playing(): # 음악이 재생중일 때
+                    if ctx.voice_client.is_paused(): # 음악이 일시정지 상태일 때
+                        await asyncio.sleep(0.1) 
+                        continue
+                    time = tt.time() - self.now_time
+                    for i in range(self.subtitles_index, len(subtitle['subtitles'])):
+                        if time >= subtitle['subtitles'][i]['time']:
+                            self.subtitles_index += 1
+                            subtitle_change = True
+                            break
+
+                    embedtitle.remove_field(0)
+                    embedtitle.remove_field(0)
+                    embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
+                    # 다음곡
+                    if self.current + 1 < len(self.player):
+                        embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
+                    else:
+                        embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
+
+                    # 자막 출력
+                    if subtitle:
+                        if current_subtitles and subtitle_change:
+                            subtitle_change = False
+                            print("change")
+                            
+
+                            # TODO: 자막 언어 바뀔 때만 작동하도록 수정
+                            if subtitle_current_lang != self.subtitles_language:
+                                self.subtitles_language = subtitle_current_lang
+                                subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
+                            
+                            embedtitle.remove_field(2)
+                            message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
+
+                            if len(subtitle['subtitles']) > self.subtitles_index + 1:
+                                message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
+                            else:
+                                message += "```brainfuck\n End \n ```"
+                            embedtitle.add_field(name="자막", value=message, inline=False)
+                            await sendmessage.edit(embed=embedtitle)
+                    
+                    await asyncio.sleep(0.5)
+            except:
+                await ctx.send("오류가 발생하여 다음 곡을 재생합니다.")
             self.current += 1
 
         self.playing = False
