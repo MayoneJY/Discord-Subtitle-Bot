@@ -243,7 +243,7 @@ class Music():
             subtitle_change = True
             message = ""
             subtitle_current_lang = self.subtitles_language
-            subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] if current_subtitles else None)
+            subtitle = next((None if current_subtitles else sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
             # await asyncio.sleep(5)
             first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
             self.now_time = first_time - 1
@@ -267,7 +267,7 @@ class Music():
                     embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
-                    
+
                 # 자막 출력
                 if subtitle:
                     if current_subtitles and subtitle_change:
