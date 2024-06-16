@@ -60,44 +60,20 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
     @classmethod
     def from_url(cls, url, *, stream=False):
-        print(1)
-        # loop = loop or asyncio.get_event_loop()
-        print(2)
-        # def download_and_process():
-        print(3)
         data = ydl.extract_info(url, download=not stream)
-        print(4)
         if 'entries' in data:
-            print(5)
             data = data['entries'][0]
-        print(6)
         filename = data['url'] if stream else ydl.prepare_filename(data)
-        print(7)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-        
-        # return await loop.run_in_executor(None, lambda: download_and_process())
-
-    # @classmethod
-    # async def from_url(cls, url, *, loop=None, stream=False):
-    #     loop = loop or asyncio.get_event_loop()
-
-    #     data = await loop.run_in_executor(None, lambda: ydl.extract_info(url, download=not stream))
-    #     if 'entries' in data:
-    #         data = data['entries'][0]
-            
-    #     filename = data['url'] if stream else ydl.prepare_filename(data)
-
-    #     return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-
+    
     @classmethod
-    async def from_title(cls, ctx, url, *, loop=None, stream=False):
+    async def from_title(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries']
         if data == []:
-            await ctx.send("``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return 1
         else:
             data2 = []
@@ -131,8 +107,9 @@ class Music():
         self.now_time = 0 # 현재 재생 시간
 
     async def search(self, ctx, query):
-        data = await YTDLSource.from_title(ctx, query)
+        data = await YTDLSource.from_title(query)
         if data == 1:
+            await ctx.send("``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
@@ -159,6 +136,7 @@ class Music():
                 await self.import_subtitles(data.data)
             except Exception as e:
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
+            data.data['author'] = ctx.author
             self.player.append(data)
         try:
             await test.delete()
@@ -252,6 +230,12 @@ class Music():
             embedtitle = discord.Embed(title=self.player[self.current].title, url=self.player[self.current].data.get('webpage_url'))
             embedtitle.set_author(name="현재 재생중~")
             embedtitle.set_image(url=self.player[self.current].data.get('thumbnail'))
+            embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
+            # 다음곡
+            if self.current + 1 < len(self.player):
+                embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
+            else:
+                embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
             sendmessage = await ctx.send(embed=embedtitle)
 
 
@@ -296,38 +280,9 @@ class Music():
                     embedtitle.add_field(name="자막", value=message, inline=False)
                     await sendmessage.edit(embed=embedtitle)
                 
-
-
-
-
-                
-                # second_time = t.time()
-
-                # delay = second_time - first_time
-
-                # if delay > 1:
-                #     await asyncio.sleep(delay)
-                # else:
-                #     await asyncio.sleep(1-delay)
                 await asyncio.sleep(0.5)
-                # first_time = second_time + delay
-                # print(delay)
 
             self.current += 1
-
-            # Exception in voice thread Thread-4
-            # Traceback (most recent call last):
-            # File "C:\Users\akso6\AppData\Local\Programs\Python\Python312\Lib\site-packages\discord\player.py", line 756, in run
-            #     self._do_run()
-            # File "C:\Users\akso6\AppData\Local\Programs\Python\Python312\Lib\site-packages\discord\player.py", line 743, in _do_run
-            #     data = self.source.read()
-            #         ^^^^^^^^^^^^^^^^^^
-            # File "C:\Users\akso6\AppData\Local\Programs\Python\Python312\Lib\site-packages\discord\player.py", line 695, in read
-            #     ret = self.original.read()
-            #         ^^^^^^^^^^^^^^^^^^^^
-            # File "C:\Users\akso6\AppData\Local\Programs\Python\Python312\Lib\site-packages\discord\player.py", line 316, in read
-            #     ret = self._stdout.read(OpusEncoder.FRAME_SIZE)
-            #         ^^^^^^^^^^^^^^^^^
 
         self.playing = False
 
