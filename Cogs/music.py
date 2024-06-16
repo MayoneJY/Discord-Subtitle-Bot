@@ -259,6 +259,15 @@ class Music():
                         subtitle_change = True
                         break
 
+                embedtitle.remove_field(0)
+                embedtitle.remove_field(0)
+                embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
+                # 다음곡
+                if self.current + 1 < len(self.player):
+                    embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
+                else:
+                    embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
+                    
                 # 자막 출력
                 if subtitle:
                     if current_subtitles and subtitle_change:
