@@ -243,8 +243,7 @@ class Music():
             subtitle_change = True
             message = ""
             subtitle_current_lang = self.subtitles_language
-            if current_subtitles:
-                subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0])
+            subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] if current_subtitles else None)
             # await asyncio.sleep(5)
             first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
             self.now_time = first_time - 1
@@ -261,25 +260,26 @@ class Music():
                         break
 
                 # 자막 출력
-                if current_subtitles and subtitle_change:
-                    subtitle_change = False
-                    print("change")
-                    
+                if subtitle:
+                    if current_subtitles and subtitle_change:
+                        subtitle_change = False
+                        print("change")
+                        
 
-                    # TODO: 자막 언어 바뀔 때만 작동하도록 수정
-                    if subtitle_current_lang != self.subtitles_language:
-                        self.subtitles_language = subtitle_current_lang
-                        subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
-                    
-                    embedtitle.remove_field(0)
-                    message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
+                        # TODO: 자막 언어 바뀔 때만 작동하도록 수정
+                        if subtitle_current_lang != self.subtitles_language:
+                            self.subtitles_language = subtitle_current_lang
+                            subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
+                        
+                        embedtitle.remove_field(0)
+                        message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
 
-                    if len(subtitle['subtitles']) > self.subtitles_index + 1:
-                        message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
-                    else:
-                        message += "```brainfuck\n End \n ```"
-                    embedtitle.add_field(name="자막", value=message, inline=False)
-                    await sendmessage.edit(embed=embedtitle)
+                        if len(subtitle['subtitles']) > self.subtitles_index + 1:
+                            message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
+                        else:
+                            message += "```brainfuck\n End \n ```"
+                        embedtitle.add_field(name="자막", value=message, inline=False)
+                        await sendmessage.edit(embed=embedtitle)
                 
                 await asyncio.sleep(0.5)
 
@@ -337,6 +337,15 @@ class Core(commands.Cog, name="뮤직봇"):
             raise CustomError("유튜브 URL이 아닙니다.")
 
         await guilds[ctx.guild.id].queue(ctx, url)
+
+    @slash_command(name="skip", description="음악을 건너뜁니다.", guild_ids=guild_ids)
+    async def skip(self, ctx):
+        if not guilds.get(ctx.guild.id):
+            raise CustomError("음악이 재생되고 있지 않습니다.")
+        if not ctx.voice_client.is_playing():
+            raise CustomError("음악이 재생되고 있지 않습니다.")
+        ctx.voice_client.stop()
+        await ctx.send("음악을 건너뛸게요.")
         
     
     @play.before_invoke
