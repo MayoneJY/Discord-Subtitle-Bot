@@ -294,6 +294,8 @@ class Music():
                     
                     await asyncio.sleep(0.5)
             except:
+                
+                ctx.voice_client.stop()
                 await ctx.send("오류가 발생하여 다음 곡을 재생합니다.")
             self.current += 1
 
