@@ -252,7 +252,9 @@ class Music():
                 first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
                 self.now_time = first_time - 1
 
-                while ctx.voice_client.is_playing(): # 음악이 재생중일 때
+                while True: # 음악이 재생중일 때
+                    if not ctx.voice_client.is_playing(): # 음악이 재생중이지 않을 때
+                        break
                     if ctx.voice_client.is_paused(): # 음악이 일시정지 상태일 때
                         await asyncio.sleep(0.1) 
                         continue
