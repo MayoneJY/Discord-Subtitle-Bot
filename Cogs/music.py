@@ -271,7 +271,7 @@ class Music():
                             self.subtitles_language = subtitle_current_lang
                             subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
                         
-                        embedtitle.remove_field(0)
+                        embedtitle.remove_field(1)
                         message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
 
                         if len(subtitle['subtitles']) > self.subtitles_index + 1:
