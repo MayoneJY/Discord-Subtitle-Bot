@@ -257,11 +257,12 @@ class Music():
                         await asyncio.sleep(0.1) 
                         continue
                     time = tt.time() - self.now_time
-                    for i in range(self.subtitles_index, len(subtitle['subtitles'])):
-                        if time >= subtitle['subtitles'][i]['time']:
-                            self.subtitles_index += 1
-                            subtitle_change = True
-                            break
+                    if subtitle:
+                        for i in range(self.subtitles_index, len(subtitle['subtitles'])):
+                            if time >= subtitle['subtitles'][i]['time']:
+                                self.subtitles_index += 1
+                                subtitle_change = True
+                                break
 
                     embedtitle.remove_field(0)
                     embedtitle.remove_field(0)
