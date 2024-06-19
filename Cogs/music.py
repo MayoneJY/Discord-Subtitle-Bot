@@ -121,8 +121,11 @@ class Music():
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)
 
-    async def queue(self, ctx, url):
-        test = await ctx.send("로딩중...")
+    async def queue(self, ctx, url, msg=None):
+        if msg:
+            await msg.edit(content="로딩중...")
+        else:
+            test = await ctx.send("로딩중...")
         check_player = False
         
         for p in self.player:
@@ -142,11 +145,10 @@ class Music():
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
             data.data['author'] = ctx.author.global_name
             self.player.append(data)
-        try:
-            await test.delete()
-        except:
-            pass
-        await ctx.send("재생목록에 추가되었습니다.", delete_after=5)
+        if msg:
+            await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+        else:
+            await test.edit("재생목록에 추가되었습니다.", delete_after=5)
         if not self.playing:
             await self.play(ctx)
 
