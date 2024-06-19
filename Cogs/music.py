@@ -296,7 +296,9 @@ class Music():
                                 message += "```brainfuck\n End \n ```"
                             embedtitle.add_field(name="자막", value=message, inline=False)
                             await sendmessage.edit(embed=embedtitle)
-                    
+                    else:
+                        await asyncio.sleep(0.5)
+                        await sendmessage.edit(embed=embedtitle)
                     await asyncio.sleep(0.5)
             except Exception as e:
                 print(e)
