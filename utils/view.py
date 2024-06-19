@@ -26,7 +26,8 @@ class SearchView(View):
         self.add_item(self.button_cancel)
 
     async def init(self, interaction):
-        self.original_message = await interaction.channel.fetch_message(interaction.message.id)
+        if self.original_message is None:
+            self.original_message = await interaction.channel.fetch_message(interaction.message.id)
 
     async def embed(self):
         embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
