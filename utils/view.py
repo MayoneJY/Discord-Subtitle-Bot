@@ -28,10 +28,12 @@ class SearchView(View):
     async def init(self, msg):
         self.msg = await self.ctx.channel.fetch_message(msg.id)
 
-    async def embed(self):
+    async def embed(self, interaction):
         embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{self.data[self.page*2]}/hqdefault.jpg")
-        await self.msg.edit(embed=embed, view=self)
+        # await self.msg.edit(embed=embed, view=self)
+        await interaction.response.edit_message(embed=embed, view=self)
+
 
     async def prev(self, interaction):
         await interaction.response.defer()
@@ -49,7 +51,7 @@ class SearchView(View):
         else:
             self.page += 1
 
-        await self.embed()
+        await self.embed(interaction)
 
     async def add(self, interaction):
         await interaction.response.defer()

@@ -118,8 +118,8 @@ class Music():
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
         view = SearchView(ctx, data, self)
-        msg = await ctx.edit(content="", view=view, embed=embed)
-        await view.init(msg.id)
+        await ctx.edit(content="", view=view, embed=embed)
+        # await view.init(await ctx.interaction.original_message().id)
 
     async def queue(self, ctx, url):
         test = await ctx.send("로딩중...")
