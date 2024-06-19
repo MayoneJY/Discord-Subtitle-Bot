@@ -119,7 +119,7 @@ class Music():
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
         view = SearchView(ctx, data, self)
         msg = await ctx.edit(content="", view=view, embed=embed)
-        view.init(msg)
+        await view.init(msg.id)
 
     async def queue(self, ctx, url):
         test = await ctx.send("로딩중...")

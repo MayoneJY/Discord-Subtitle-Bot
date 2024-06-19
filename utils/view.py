@@ -25,8 +25,8 @@ class SearchView(View):
         self.add_item(self.button_add)
         self.add_item(self.button_cancel)
 
-    def init(self, msg):
-        self.msg = msg
+    async def init(self, msg):
+        self.msg = await self.ctx.channel.fetch_message(msg.id)
 
     async def embed(self):
         embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
