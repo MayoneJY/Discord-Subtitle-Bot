@@ -1,6 +1,5 @@
 from discord.ext import commands
 from discord.commands import slash_command, Option
-from discord.interactions import Interaction
 from discord.ui import Select, View, Button
 from discord import Embed
 import discord
@@ -107,19 +106,19 @@ class Music():
         self.volume = 0.1 # 볼륨
         self.now_time = 0 # 현재 재생 시간
 
-    async def search(self, interaction: Interaction, query):
-        if interaction.response.is_done():
-            await interaction.edit_original_response(content="검색중...")
+    async def search(self, ctx, query):
+        if ctx.response.is_done():
+            await ctx.edit(content="검색중...")
         else:
-            await interaction.response.send_message("검색중...")
+            await ctx.respond("검색중...")
         data = await YTDLSource.from_title(query)
         if data == 1:
-            await interaction.edit_original_response(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
+            await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
-        view = SearchView(interaction, data, self)
-        msg = await interaction.edit_original_response(content="", view=view, embed=embed)
+        view = SearchView(ctx, data, self)
+        msg = await ctx.edit(content="", view=view, embed=embed)
         view.init(msg)
 
     async def queue(self, ctx, url):
