@@ -35,7 +35,6 @@ class SearchView(View):
 
 
     async def prev(self, interaction):
-        await interaction.response.defer()
         await self.init(interaction)
         if self.page == 0:
             self.page = 4
@@ -45,7 +44,6 @@ class SearchView(View):
         await self.embed()
 
     async def next(self, interaction):
-        await interaction.response.defer()
         await self.init(interaction)
         if self.page == 4:
             self.page = 0
@@ -55,13 +53,11 @@ class SearchView(View):
         await self.embed()
 
     async def add(self, interaction):
-        await interaction.response.defer()
         await self.init(interaction)
         await self.original_message.delete()
         await self.music.queue(self.ctx, f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
 
     async def cancel(self, interaction):
-        await interaction.response.defer()
         await self.init(interaction)
         await self.original_message.delete()
 
