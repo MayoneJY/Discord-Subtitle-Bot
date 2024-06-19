@@ -115,7 +115,7 @@ class Music():
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
         view = SearchView(ctx, data, self)
-        msg = await ctx.edit(msg, view=view, embed=embed)
+        msg = await ctx.edit(content=msg, view=view, embed=embed)
         view.init(msg)
 
     async def queue(self, ctx, url):
@@ -369,7 +369,7 @@ class Core(commands.Cog, name="뮤직봇"):
         if not ctx.voice_client.is_playing():
             raise CustomError("음악이 재생되고 있지 않습니다.")
         ctx.voice_client.stop()
-        await ctx.send("음악을 건너뛸게요.")
+        await ctx.send("음악을 건너뛸게요.", delete_after=5)
         
     
     @play.before_invoke
