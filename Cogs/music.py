@@ -108,7 +108,10 @@ class Music():
         self.now_time = 0 # 현재 재생 시간
 
     async def search(self, interaction: Interaction, query):
-        await interaction.response.send_message("검색중...")
+        if interaction.response.is_done():
+            await interaction.edit_original_response(content="검색중...")
+        else:
+            await interaction.response.send_message("검색중...")
         data = await YTDLSource.from_title(query)
         if data == 1:
             await interaction.edit_original_response(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
