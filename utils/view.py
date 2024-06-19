@@ -9,6 +9,7 @@ class SearchView(View):
         self.ctx = ctx
         self.data = data
         self.music = music
+        self.original_message = None
 
         self.button_prev = Button(style=ButtonStyle.primary, label="이전", custom_id="prev", emoji="⬅️")
         self.button_next = Button(style=ButtonStyle.primary, label="다음", custom_id="next", emoji="➡️")
