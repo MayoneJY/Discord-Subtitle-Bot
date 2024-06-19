@@ -32,7 +32,8 @@ class SearchView(View):
         embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{self.data[self.page*2]}/hqdefault.jpg")
         # await self.msg.edit(embed=embed, view=self)
-        await interaction.response.edit_message(embed=embed, view=self)
+        original_message = await interaction.channel.fetch_message(interaction.message.id)
+        await original_message.edit(embed=embed, view=self)
 
 
     async def prev(self, interaction):
