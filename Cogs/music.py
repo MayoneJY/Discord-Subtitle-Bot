@@ -1,5 +1,6 @@
 from discord.ext import commands
 from discord.commands import slash_command, Option
+from discord.interactions import Interaction
 from discord.ui import Select, View, Button
 from discord import Embed
 import discord
@@ -106,16 +107,16 @@ class Music():
         self.volume = 0.1 # 볼륨
         self.now_time = 0 # 현재 재생 시간
 
-    async def search(self, ctx, query):
-        msg = await ctx.send("검색중...")
+    async def search(self, interaction: Interaction, query):
+        await interaction.response.send_message("검색중...")
         data = await YTDLSource.from_title(query)
         if data == 1:
-            await ctx.send("``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
+            await interaction.edit_original_response(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
-        view = SearchView(ctx, data, self)
-        msg = await ctx.edit(content=msg, view=view, embed=embed)
+        view = SearchView(interaction, data, self)
+        msg = await interaction.edit_original_response(content="", view=view, embed=embed)
         view.init(msg)
 
     async def queue(self, ctx, url):
@@ -340,16 +341,16 @@ class Core(commands.Cog, name="뮤직봇"):
         await ctx.send("음성 채널에서 퇴장했습니다.")
 
     @slash_command(name="play", description="음악을 재생합니다.", guild_ids=guild_ids)
-    async def play(self, ctx, url: str):
+    async def play(self, interaction, url: str):
         
-        if not guilds.get(ctx.guild.id):
-            guilds[ctx.guild.id] = Music(self.loop)
+        if not guilds.get(interaction.guild.id):
+            guilds[interaction.guild.id] = Music(self.loop)
 
 
 
         # URL이 아닐 경우
         if not url.startswith("http"):
-            await guilds[ctx.guild.id].search(ctx, url)
+            await guilds[interaction.guild.id].search(interaction, url)
             return
         # 잘못된 URL
         elif not url.startswith("https://www.youtube.com/watch?v=") or \
@@ -360,7 +361,7 @@ class Core(commands.Cog, name="뮤직봇"):
             not url.startswith("https://www.youtube.com/playlist?list="):
             raise CustomError("유튜브 URL이 아닙니다.")
 
-        await guilds[ctx.guild.id].queue(ctx, url)
+        await guilds[interaction.guild.id].queue(interaction, url)
 
     @slash_command(name="skip", description="음악을 건너뜁니다.", guild_ids=guild_ids)
     async def skip(self, ctx):
