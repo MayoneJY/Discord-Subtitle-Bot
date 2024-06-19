@@ -33,10 +33,11 @@ class SearchView(View):
     async def embed(self):
         embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{self.data[self.page*2]}/hqdefault.jpg")
-        await self.original_message.edit_message(embed=embed, view=self)
+        await self.original_message.edit(embed=embed, view=self)
 
 
     async def prev(self, interaction):
+        await interaction.response.defer()
         await self.init(interaction)
         if self.page == 0:
             self.page = 4
@@ -46,6 +47,7 @@ class SearchView(View):
         await self.embed()
 
     async def next(self, interaction):
+        await interaction.response.defer()
         await self.init(interaction)
         if self.page == 4:
             self.page = 0
@@ -55,11 +57,13 @@ class SearchView(View):
         await self.embed()
 
     async def add(self, interaction):
+        await interaction.response.defer()
         await self.init(interaction)
         # await self.original_message.delete()
         await self.music.queue(self.ctx, f"https://www.youtube.com/watch?v={self.data[self.page*2]}", self.original_message)
 
     async def cancel(self, interaction):
+        await interaction.response.defer()
         await self.init(interaction)
         await self.original_message.delete()
 
