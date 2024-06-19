@@ -107,6 +107,7 @@ class Music():
         self.now_time = 0 # 현재 재생 시간
 
     async def search(self, ctx, query):
+        msg = await ctx.send("검색중...")
         data = await YTDLSource.from_title(query)
         if data == 1:
             await ctx.send("``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
@@ -114,7 +115,7 @@ class Music():
         embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
         embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
         view = SearchView(ctx, data, self)
-        msg = await ctx.send(view=view, embed=embed)
+        msg = await ctx.edit(msg, view=view, embed=embed)
         view.init(msg)
 
     async def queue(self, ctx, url):
