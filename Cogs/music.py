@@ -123,7 +123,7 @@ class Music():
 
     async def queue(self, ctx, url, msg=None):
         if msg:
-            await msg.edit(content="로딩중...")
+            await msg.edit(content="로딩중...", view=None, embed=None)
         else:
             test = await ctx.send("로딩중...")
         check_player = False
