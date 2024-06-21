@@ -171,7 +171,7 @@ class Music():
             return
         for i in range(0, len(data), 2):
             data[i] = f"https://www.youtube.com/watch?v={data[i]}"
-        await self.queue(ctx, data)
+        await self.list_queue(ctx, data)
 
     async def list_queue(self, ctx, url, msg=None):
         if msg:
