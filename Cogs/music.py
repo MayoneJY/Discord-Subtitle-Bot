@@ -372,12 +372,11 @@ class Core(commands.Cog, name="뮤직봇"):
             await guilds[interaction.guild.id].search(interaction, url)
             return
         # 잘못된 URL
-        elif not (url.startswith("https://www.youtube.com/watch?v=") or \
+        elif not (url.startswith("https://www.youtube.com/") or \
             url.startswith("https://youtu.be/") or \
-            url.startswith("https://youtube.com/watch?v=") or \
-            url.startswith("https://music.youtube.com/watch?v=") or \
-            url.startswith("https://m.youtube.com/watch?v=") or \
-            url.startswith("https://www.youtube.com/playlist?list=")):
+            url.startswith("https://youtube.com/") or \
+            url.startswith("https://music.youtube.com/") or \
+            url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
 
         await guilds[interaction.guild.id].queue(interaction, url)
