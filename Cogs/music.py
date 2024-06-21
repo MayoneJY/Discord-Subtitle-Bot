@@ -63,6 +63,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = ydl.extract_info(url, download=not stream)
         if 'entries' in data:
             data = data['entries'][0]
+            raise CustomError(len(data['entries']))
         filename = data['url'] if stream else ydl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
     
@@ -105,6 +106,16 @@ class Music():
         self.player = [] # 음악 플레이어 - discord.FFmpegPCMAudio
         self.volume = 0.1 # 볼륨
         self.now_time = 0 # 현재 재생 시간
+
+    def reset(self):
+        self.music_loop = False
+        self.playing = False
+        self.subtitles = []
+        self.subtitles_index = 0
+        self.subtitles_language = "ko"
+        self.current = 0
+        self.player = []
+        self.now_time = 0
 
     async def search(self, ctx, query):
         if ctx.response.is_done():
@@ -341,6 +352,9 @@ class Core(commands.Cog, name="뮤직봇"):
         if ctx.voice_client is None:
             await ctx.send("음성 채널에 봇이 없습니다.")
             return
+        if ctx.voice_client.is_playing():
+            ctx.voice_client.stop()
+            guilds[ctx.guild.id].reset()
         await ctx.voice_client.disconnect()
         await ctx.send("음성 채널에서 퇴장했습니다.")
 
