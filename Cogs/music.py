@@ -170,13 +170,47 @@ class Music():
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
         for i in range(0, len(data), 2):
-            await self.queue(ctx, f"https://www.youtube.com/watch?v={data[i]}")
+            data[i] = f"https://www.youtube.com/watch?v={data[i]}"
+        await self.queue(ctx, data)
+
+    async def list_queue(self, ctx, url, msg=None):
+        if msg:
+            await msg.edit(content="로딩중...", view=None, embed=None)
+        else:
+            test = await ctx.send("로딩중...")
+        for i in range(0, len(url), 2):
+            check_player = False
+            
+            for p in self.player:
+                if p.data.get('webpage_url').split("v=")[1] == url[i].split("v=")[1].split("&")[0]:
+                    check_player = True
+                    self.player.append(p)
+                    self.subtitles.append(subtitle for subtitle in self.subtitles if subtitle['title'] == p.title)
+                    break
+            if not check_player:
+                try:
+                    data = await self.loop.run_in_executor(None, YTDLSource.from_url, url[i])
+                except Exception as e:
+                    raise CustomError(f"다운로드 중 오류가 발생했습니다. {e}")
+                try:
+                    await self.import_subtitles(data.data)
+                except Exception as e:
+                    raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
+                data.data['author'] = ctx.author.global_name
+                self.player.append(data)
+        if msg:
+            await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+        else:
+            await test.edit("재생목록에 추가되었습니다.", delete_after=5)
+        if not self.playing:
+            await self.play(ctx)
 
     async def queue(self, ctx, url, msg=None):
         if msg:
             await msg.edit(content="로딩중...", view=None, embed=None)
         else:
             test = await ctx.send("로딩중...")
+
         check_player = False
         
         for p in self.player:
