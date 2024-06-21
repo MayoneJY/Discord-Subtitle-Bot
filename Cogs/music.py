@@ -33,10 +33,10 @@ ytdl_format_options = {
     'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 ydl_opts = {
-    # 'default_search': 'ytsearch',  # YouTube 검색 모드
+    'default_search': 'ytsearch',  # YouTube 검색 모드
     'quiet': True,                # 출력 최소화
     'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
-    # 'noplaylist': True,           # 플레이리스트 제외
+    'noplaylist': True,           # 플레이리스트 제외
 }
 
 ffmpeg_options = {
@@ -63,8 +63,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
         data = ydl.extract_info(url, download=not stream)
         if 'entries' in data:
             data = data['entries'][0]
-        print(data)
-        raise CustomError(len(data))
         filename = data['url'] if stream else ydl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
     
@@ -171,7 +169,7 @@ class Music():
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        for i in range(1, len(data), 2):
+        for i in range(0, len(data), 2):
             await self.queue(ctx, f"https://www.youtube.com/watch?v={data[i]}")
 
     async def queue(self, ctx, url, msg=None):
