@@ -33,10 +33,10 @@ ytdl_format_options = {
     'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 ydl_opts = {
-    'default_search': 'ytsearch',  # YouTube 검색 모드
+    # 'default_search': 'ytsearch',  # YouTube 검색 모드
     'quiet': True,                # 출력 최소화
     'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
-    'noplaylist': True,           # 플레이리스트 제외
+    # 'noplaylist': True,           # 플레이리스트 제외
 }
 
 ffmpeg_options = {
