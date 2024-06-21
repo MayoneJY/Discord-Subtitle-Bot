@@ -94,6 +94,34 @@ class YTDLSource(discord.PCMVolumeTransformer):
                 pass
 
             return data2
+    
+    
+    @classmethod
+    async def from_list(cls, url, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(url, download=stream))
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries']
+        if data == []:
+            return 1
+        else:
+            data2 = []
+            data2.append(data[0]['id'])
+            data2.append(data[0]['title'])
+            try:
+                if len(data[0]) >= 5:
+                    for i in range(1, 5):
+                        data2.append(data[i]['id'])
+                        data2.append(data[i]['title'])
+                else:
+                    for i in range(1, len(data[0])):
+                        data2.append(data[i]['id'])
+                        data2.append(data[i]['title'])
+            except:
+                pass
+
+            return data2
 
 class Music():
     def __init__(self, loop):
@@ -132,6 +160,19 @@ class Music():
         view = SearchView(ctx, data, self)
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)
+
+    async def list(self, ctx, url):
+        if ctx.response.is_done():
+            await ctx.edit(content="검색중...")
+        else:
+            await ctx.respond("검색중...")
+        url = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
+        data = await YTDLSource.from_list(url)
+        if data == 1:
+            await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
+            return
+        for i in range(1, len(data), 2):
+            await self.queue(ctx, f"https://www.youtube.com/watch?v={data[i]}")
 
     async def queue(self, ctx, url, msg=None):
         if msg:
@@ -378,6 +419,8 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://music.youtube.com/") or \
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
+        elif "list=" in url:
+            await guilds[interaction.guild.id].list(interaction, url)
 
         await guilds[interaction.guild.id].queue(interaction, url)
 
