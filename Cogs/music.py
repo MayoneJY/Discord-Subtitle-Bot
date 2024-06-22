@@ -227,7 +227,12 @@ class Music():
         await self.download(ctx, url)
 
         if msg:
-            await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+            try:
+                await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+            except:
+                await msg.edit(content="재생목록에 추가되었습니다.")
+                tt.sleep(5)
+                await msg.delete()
         else:
             await test.edit("재생목록에 추가되었습니다.", delete_after=5)
 
