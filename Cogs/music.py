@@ -11,7 +11,6 @@ from requests import Session
 import re
 from utils.error import CustomError
 from utils.view import SearchView
-import threading
 
 guilds = {}
 
@@ -166,7 +165,7 @@ class Music():
         else:
             await ctx.respond("검색중...")
         data = await YTDLSource.from_title(query)
-        for i in range(1, len(data), 2):
+        for i in range(0, len(data), 2):
             if query.split("&v=")[1].split("&")[0] == data[i]:
                 break
             data.pop(i)
@@ -185,7 +184,7 @@ class Music():
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        for i in range(0, len(data), 2):
+        for i in range(1, len(data), 2):
             data[i] = f"https://www.youtube.com/watch?v={data[i]}"
         await self.list_queue(ctx, data)
 
@@ -203,7 +202,7 @@ class Music():
                 time = tt.time()
                 await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
             if not self.playing:
-                threading.Thread(target=self.play, args=(ctx,)).start()
+                task = asyncio.create_task(self.play(ctx))
                 
 
         if msg:
