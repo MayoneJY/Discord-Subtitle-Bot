@@ -10,7 +10,7 @@ import time as tt
 from requests import Session
 import re
 from utils.error import CustomError
-from utils.view import SearchView
+from utils.view import SearchView, ListView
 
 guilds = {}
 
@@ -174,17 +174,18 @@ class Music():
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)
 
-    async def list(self, ctx, url):
+    async def list(self, ctx, url, current=False):
         
         urltemp = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
         data = await YTDLSource.from_list(urltemp)
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        for i in range(0, len(data), 2):
-            if url.split("v=")[1].split("&")[0] == data[i]:
-                data = data[i:]
-                break
+        if current:
+            for i in range(0, len(data), 2):
+                if url.split("v=")[1].split("&")[0] == data[i]:
+                    data = data[i:]
+                    break
         for i in range(0, len(data), 2):
             data[i] = f"https://www.youtube.com/watch?v={data[i]}"
         await self.list_queue(ctx, data)
@@ -453,7 +454,7 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
-            await guilds[interaction.guild.id].list(interaction, url)
+            await interaction.response.send_message("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=ListView(guilds[interaction.guild.id], url), ephemeral=True)
 
         await guilds[interaction.guild.id].queue(interaction, url)
 
