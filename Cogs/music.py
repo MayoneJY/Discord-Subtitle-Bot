@@ -198,12 +198,10 @@ class Music():
         time = tt.time()
 
         for i in range(0, len(url), 2):
-            await self.download(ctx, url[i])
+            asyncio.create_task(self.download(ctx, url[i]))
             if tt.time() - time > 1:
                 time = tt.time()
                 await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
-            if not self.playing:
-                task = asyncio.create_task(self.play(ctx))
                 
 
         if msg:
