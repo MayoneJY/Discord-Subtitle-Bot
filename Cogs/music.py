@@ -454,7 +454,9 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
-            await interaction.followup.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=ListView(guilds[interaction.guild.id], url), ephemeral=True)
+            view = ListView(guilds[interaction.guild.id], url)
+            msg = await interaction.followup.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view, ephemeral=True)
+            view.init(msg)
         else:
             await guilds[interaction.guild.id].queue(interaction, url)
 

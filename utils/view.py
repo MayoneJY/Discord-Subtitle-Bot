@@ -20,20 +20,27 @@ class ListView(View):
         self.add_item(self.button2)
         self.add_item(self.button3)
 
+    def init(self, msg):
+        self.original_message = msg
+
     async def first(self, interaction):
         await interaction.response.defer()
-        await self.music.list(interaction, self.url)
-        await interaction.response.send_message("처음 곡부터 추가합니다.", ephemeral=True)
+        msg = await interaction.response.send_message("처음 곡부터 추가합니다.", ephemeral=True)
+        await self.music.list(interaction, self.url, msg=msg)
+        await self.original_message.delete()
+
 
     async def current(self, interaction):
         await interaction.response.defer()
-        await self.music.list(interaction, self.url, current=True)
-        await interaction.response.send_message("현재 곡부터 추가합니다.", ephemeral=True)
+        msg = await interaction.response.send_message("현재 곡부터 추가합니다.", ephemeral=True)
+        await self.music.list(interaction, self.url, current=True, msg=msg)
+        await self.original_message.delete()
 
     async def one(self, interaction):
         await interaction.response.defer()
-        await self.music.queue(interaction, self.url.split("&list=")[0])
-        await interaction.response.send_message("한 곡만 추가합니다.", ephemeral=True)
+        msg = await interaction.response.send_message("한 곡만 추가합니다.", ephemeral=True)
+        await self.music.queue(interaction, self.url.split("&list=")[0], msg=msg)
+        await self.original_message.delete()
 
 class SearchView(View):
     def __init__(self, ctx, data, music):
