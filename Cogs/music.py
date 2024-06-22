@@ -37,7 +37,7 @@ ydl_opts = {
     'quiet': True,                # 출력 최소화
     'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
     'noplaylist': True,           # 플레이리스트 제외
-    "concurrent_fragment_downloads": 5,
+    "concurrent_fragment_downloads": '5',
 }
 
 ffmpeg_options = {
