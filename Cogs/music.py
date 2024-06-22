@@ -108,14 +108,9 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data2.append(data[0]['id'])
             data2.append(data[0]['title'])
             try:
-                if len(data[0]) >= 5:
-                    for i in range(1, 5):
-                        data2.append(data[i]['id'])
-                        data2.append(data[i]['title'])
-                else:
-                    for i in range(1, len(data[0])):
-                        data2.append(data[i]['id'])
-                        data2.append(data[i]['title'])
+                for i in range(1, len(data[0])):
+                    data2.append(data[i]['id'])
+                    data2.append(data[i]['title'])
             except:
                 pass
 
@@ -193,7 +188,7 @@ class Music():
         if msg:
             await msg.edit(content="로딩중...", view=None, embed=None)
         else:
-            test = await ctx.send(f"로딩중... (0/{len(url) / 2})")
+            test = await ctx.send(f"로딩중... (0/{int(len(url) / 2)})")
         
         time = tt.time()
 
@@ -201,7 +196,7 @@ class Music():
             await self.download(ctx, url[i])
             if tt.time() - time > 1:
                 time = tt.time()
-                await test.edit(f"로딩중... ({i/2+1}/{len(url) / 2})")
+                await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
                 
 
         if msg:
