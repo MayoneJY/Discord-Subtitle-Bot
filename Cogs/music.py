@@ -193,15 +193,21 @@ class Music():
         if msg:
             await msg.edit(content="로딩중...", view=None, embed=None)
         else:
-            test = await ctx.send("로딩중...")
+            test = await ctx.send(f"로딩중... (0/{len(url) / 2})")
+        
+        time = tt.time()
 
         for i in range(0, len(url), 2):
             await self.download(ctx, url[i])
+            if tt.time() - time > 1:
+                time = tt.time()
+                await test.edit(f"로딩중... ({i/2+1}/{len(url) / 2})")
+                
 
         if msg:
-            await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+            await msg.edit(content=f"{len(url) / 2}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
         else:
-            await test.edit("재생목록에 추가되었습니다.", delete_after=5)
+            await test.edit(f"{len(url) / 2}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
 
         if not self.playing:
             await self.play(ctx)
@@ -218,7 +224,7 @@ class Music():
             await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
         else:
             await test.edit("재생목록에 추가되었습니다.", delete_after=5)
-            
+
         if not self.playing:
             await self.play(ctx)
 
