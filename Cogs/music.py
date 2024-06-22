@@ -443,16 +443,16 @@ class Core(commands.Cog, name="뮤직봇"):
         await ctx.send("음성 채널에서 퇴장했습니다.")
 
     @slash_command(name="play", description="음악을 재생합니다.", guild_ids=guild_ids)
-    async def play(self, interaction, url: str):
+    async def play(self, ctx, url: str):
         
-        if not guilds.get(interaction.guild.id):
-            guilds[interaction.guild.id] = Music(self.loop)
+        if not guilds.get(ctx.guild.id):
+            guilds[ctx.guild.id] = Music(self.loop)
 
 
 
         # URL이 아닐 경우
         if not url.startswith("http"):
-            await guilds[interaction.guild.id].search(interaction, url)
+            await guilds[ctx.guild.id].search(ctx, url)
             return
         # 잘못된 URL
         elif not (url.startswith("https://www.youtube.com/") or \
@@ -462,11 +462,11 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
-            view = ListView(guilds[interaction.guild.id], url)
-            msg = await interaction.followup.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
+            view = ListView(guilds[ctx.guild.id], url)
+            msg = await ctx.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
             view.init(msg)
         else:
-            await guilds[interaction.guild.id].queue(interaction, url)
+            await guilds[ctx.guild.id].queue(ctx, url)
 
     @slash_command(name="skip", description="음악을 건너뜁니다.", guild_ids=guild_ids)
     async def skip(self, ctx):
