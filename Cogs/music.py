@@ -23,15 +23,14 @@ ytdl_format_options = {
     'format': 'bestaudio/best',
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
-    # 'noplaylist': True,
+    'noplaylist': True,
     'nocheckcertificate': True,
     'ignoreerrors': False,
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
-    "concurrent_fragment_downloads": 5,
+    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
 }
 ydl_opts = {
     'default_search': 'ytsearch',  # YouTube 검색 모드
@@ -98,7 +97,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_list(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(url, download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"--concurrent-fragments 5 {url}", download=stream))
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries']
@@ -202,6 +201,8 @@ class Music():
             if tt.time() - time > 1:
                 time = tt.time()
                 await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
+            if not self.playing:
+                await self.play(ctx)
                 
 
         if msg:
@@ -443,7 +444,7 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
-            await guilds[interaction.guild.id].queue(interaction, url)
+            await guilds[interaction.guild.id].list(interaction, url)
 
         await guilds[interaction.guild.id].queue(interaction, url)
 
