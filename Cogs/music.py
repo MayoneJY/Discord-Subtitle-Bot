@@ -210,6 +210,8 @@ class Music():
             await test.edit(f"{int(len(url) / 2)}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
 
         if not self.playing:
+            while self.player == []:
+                tt.sleep(0.1)
             await self.play(ctx)
 
     async def queue(self, ctx, url, msg=None):
