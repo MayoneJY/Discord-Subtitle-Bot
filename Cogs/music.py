@@ -139,31 +139,6 @@ class Music():
         self.player = []
         self.now_time = 0
 
-    async def search(self, ctx, query):
-        if ctx.response.is_done():
-            await ctx.edit(content="검색중...")
-        else:
-            await ctx.respond("검색중...")
-        data = await YTDLSource.from_title(query)
-        if data == 1:
-            await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
-            return
-        embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
-        embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
-        view = SearchView(ctx, data, self)
-        await ctx.edit(content="", view=view, embed=embed)
-        # await view.init(await ctx.interaction.original_message().id)
-
-    async def list(self, ctx, url):
-        url = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
-        data = await YTDLSource.from_list(url)
-        if data == 1:
-            await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
-            return
-        for i in range(0, len(data), 2):
-            data[i] = f"https://www.youtube.com/watch?v={data[i]}"
-        await self.list_queue(ctx, data)
-
     async def download(self, ctx, url):
         check_player = False
         for p in self.player:
@@ -183,6 +158,35 @@ class Music():
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
             data.data['author'] = ctx.author.global_name
             self.player.append(data)
+
+    async def search(self, ctx, query):
+        if ctx.response.is_done():
+            await ctx.edit(content="검색중...")
+        else:
+            await ctx.respond("검색중...")
+        data = await YTDLSource.from_title(query)
+        for i in range(0, len(data), 2):
+            if query.split("&v=")[1].split("&")[0] == data[i]:
+                break
+            data.pop(i)
+        if data == 1:
+            await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
+            return
+        embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
+        embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
+        view = SearchView(ctx, data, self)
+        await ctx.edit(content="", view=view, embed=embed)
+        # await view.init(await ctx.interaction.original_message().id)
+
+    async def list(self, ctx, url):
+        url = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
+        data = await YTDLSource.from_list(url)
+        if data == 1:
+            await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
+            return
+        for i in range(0, len(data), 2):
+            data[i] = f"https://www.youtube.com/watch?v={data[i]}"
+        await self.list_queue(ctx, data)
 
     async def list_queue(self, ctx, url, msg=None):
         if msg:
