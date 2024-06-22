@@ -387,7 +387,10 @@ class Music():
             except Exception as e:
                 print(e)
                 ctx.voice_client.stop()
-                await sendmessage.delete()
+                try:
+                    await sendmessage.delete()
+                except:
+                    pass
                 await ctx.send("오류가 발생하여 다음 곡을 재생합니다.")
             self.current += 1
             await sendmessage.delete()
