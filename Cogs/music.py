@@ -182,7 +182,7 @@ class Music():
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
         for i in range(0, len(data), 2):
-            if url.split("&v=")[1].split("&")[0] == data[i]:
+            if url.split("v=")[1].split("&")[0] == data[i]:
                 data = data[i:]
                 break
         for i in range(0, len(data), 2):
