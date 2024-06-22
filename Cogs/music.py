@@ -455,8 +455,8 @@ class Core(commands.Cog, name="뮤직봇"):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
             await interaction.followup.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=ListView(guilds[interaction.guild.id], url), ephemeral=True)
-
-        await guilds[interaction.guild.id].queue(interaction, url)
+        else:
+            await guilds[interaction.guild.id].queue(interaction, url)
 
     @slash_command(name="skip", description="음악을 건너뜁니다.", guild_ids=guild_ids)
     async def skip(self, ctx):
