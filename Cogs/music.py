@@ -37,6 +37,7 @@ ydl_opts = {
     'quiet': True,                # 출력 최소화
     'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
     'noplaylist': True,           # 플레이리스트 제외
+    "concurrent_fragment_downloads": 5,
 }
 
 ffmpeg_options = {
@@ -97,7 +98,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_list(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info({url}, download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(url, download=stream))
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries']
