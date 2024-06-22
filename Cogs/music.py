@@ -23,21 +23,21 @@ ytdl_format_options = {
     'format': 'bestaudio/best',
     'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
     'restrictfilenames': True,
-    'noplaylist': True,
+    # 'noplaylist': True,
     'nocheckcertificate': True,
     'ignoreerrors': False,
     'logtostderr': False,
     'quiet': True,
     'no_warnings': True,
     'default_search': 'auto',
-    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
+    'source_address': '0.0.0.0',  # bind to ipv4 since ipv6 addresses cause issues sometimes
+    "concurrent_fragment_downloads": 5,
 }
 ydl_opts = {
     'default_search': 'ytsearch',  # YouTube 검색 모드
     'quiet': True,                # 출력 최소화
     'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
     'noplaylist': True,           # 플레이리스트 제외
-    "concurrent_fragment_downloads": 5,
 }
 
 ffmpeg_options = {
@@ -443,7 +443,7 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
-            await guilds[interaction.guild.id].list(interaction, url)
+            await guilds[interaction.guild.id].queue(interaction, url)
 
         await guilds[interaction.guild.id].queue(interaction, url)
 
