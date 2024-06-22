@@ -3,8 +3,9 @@ from discord.ui.button import ButtonStyle
 from discord import Embed
 
 class ListView(View):
-    def __init__(self, music, url):
+    def __init__(self, ctx, music, url):
         super().__init__(timeout=None)
+        self.ctx = ctx
         self.music = music
         self.url = url
         
@@ -26,17 +27,17 @@ class ListView(View):
     async def first(self, interaction):
         await interaction.response.defer()
         await self.original_message.edit("처음 곡부터 추가합니다.")
-        await self.music.list(interaction, self.url, msg=self.original_message)
+        await self.music.list(self.ctx, self.url, msg=self.original_message)
 
     async def current(self, interaction):
         await interaction.response.defer()
         await self.original_message.edit("현재 곡부터 추가합니다.")
-        await self.music.list(interaction, self.url, current=True, msg=self.original_message)
+        await self.music.list(self.ctx, self.url, current=True, msg=self.original_message)
 
     async def one(self, interaction):
         await interaction.response.defer()
         await self.original_message.edit("한 곡만 추가합니다.")
-        await self.music.queue(interaction, self.url.split("&list=")[0], msg=self.original_message)
+        await self.music.queue(self.ctx, self.url.split("&list=")[0], msg=self.original_message)
 
 class SearchView(View):
     def __init__(self, ctx, data, music):
