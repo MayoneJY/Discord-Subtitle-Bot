@@ -309,8 +309,10 @@ class Music():
                 self.subtitles_index = 0
                 self.now_time = 0
                 ctx.voice_client.play(self.player[self.current])
-
-                current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == self.player[self.current].title), None)
+                try:
+                    current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == self.player[self.current].title), None)
+                except:
+                    current_subtitles = None
                 # 재생 중인 음악 정보 출력
                 embedtitle = discord.Embed(title=self.player[self.current].title, url=self.player[self.current].data.get('webpage_url'))
                 embedtitle.set_author(name="현재 재생중~")
@@ -393,7 +395,10 @@ class Music():
                     pass
                 await ctx.send("오류가 발생하여 다음 곡을 재생합니다.")
             self.current += 1
-            await sendmessage.delete()
+            try:
+                await sendmessage.delete()
+            except:
+                pass
 
         self.playing = False
 
