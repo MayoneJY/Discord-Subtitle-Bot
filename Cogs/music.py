@@ -165,10 +165,6 @@ class Music():
         else:
             await ctx.respond("검색중...")
         data = await YTDLSource.from_title(query)
-        for i in range(0, len(data), 2):
-            if query.split("&v=")[1].split("&")[0] == data[i]:
-                break
-            data.pop(i)
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
@@ -179,12 +175,16 @@ class Music():
         # await view.init(await ctx.interaction.original_message().id)
 
     async def list(self, ctx, url):
-        url = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
-        data = await YTDLSource.from_list(url)
+        
+        urltemp = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
+        data = await YTDLSource.from_list(urltemp)
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        for i in range(1, len(data), 2):
+        for i in range(len(data), 0, -2):
+            if url.split("&v=")[1].split("&")[0] == data[i]:
+                break
+            data.pop(i)
             data[i] = f"https://www.youtube.com/watch?v={data[i]}"
         await self.list_queue(ctx, data)
 
