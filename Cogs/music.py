@@ -37,6 +37,7 @@ ydl_opts = {
     'quiet': True,                # 출력 최소화
     'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
     'noplaylist': True,           # 플레이리스트 제외
+    "concurrent_fragment_downloads": 5,
 }
 
 ffmpeg_options = {
@@ -165,7 +166,7 @@ class Music():
         else:
             await ctx.respond("검색중...")
         data = await YTDLSource.from_title(query)
-        for i in range(0, len(data), 2):
+        for i in range(1, len(data), 2):
             if query.split("&v=")[1].split("&")[0] == data[i]:
                 break
             data.pop(i)
@@ -204,9 +205,9 @@ class Music():
                 
 
         if msg:
-            await msg.edit(content=f"{len(url) / 2}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await msg.edit(content=f"{int(len(url) / 2)}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
         else:
-            await test.edit(f"{len(url) / 2}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await test.edit(f"{int(len(url) / 2)}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
 
         if not self.playing:
             await self.play(ctx)
