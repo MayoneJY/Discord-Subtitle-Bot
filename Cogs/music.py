@@ -11,6 +11,7 @@ from requests import Session
 import re
 from utils.error import CustomError
 from utils.view import SearchView
+import threading
 
 guilds = {}
 
@@ -202,7 +203,7 @@ class Music():
                 time = tt.time()
                 await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
             if not self.playing:
-                await self.play(ctx)
+                threading.Thread(target=self.play, args=(ctx,)).start()
                 
 
         if msg:
