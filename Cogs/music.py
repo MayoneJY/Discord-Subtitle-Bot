@@ -97,7 +97,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
     @classmethod
     async def from_list(cls, url, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(url, download=stream))
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"--concurrent-fragments 5 {url}", download=stream))
         if 'entries' in data:
             # take first item from a playlist
             data = data['entries']
