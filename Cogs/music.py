@@ -177,7 +177,7 @@ class Music():
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)
 
-    async def list(self, ctx, url, current=False):
+    async def list(self, ctx, url, current=False, msg=None):
         
         urltemp = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
         data = await YTDLSource.from_list(urltemp)
