@@ -181,10 +181,11 @@ class Music():
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        for i in range(len(data), 0, -2):
+        for i in range(0, len(data), 2):
             if url.split("&v=")[1].split("&")[0] == data[i]:
+                data = data[i:]
                 break
-            data.pop(i)
+        for i in range(0, len(data), 2):
             data[i] = f"https://www.youtube.com/watch?v={data[i]}"
         await self.list_queue(ctx, data)
 
