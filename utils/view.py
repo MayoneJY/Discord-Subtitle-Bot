@@ -27,20 +27,16 @@ class ListView(View):
         await interaction.response.defer()
         await self.original_message.edit("처음 곡부터 추가합니다.")
         await self.music.list(interaction, self.url, msg=self.original_message)
-        await self.original_message.delete()
-
 
     async def current(self, interaction):
         await interaction.response.defer()
         await self.original_message.edit("현재 곡부터 추가합니다.")
         await self.music.list(interaction, self.url, current=True, msg=self.original_message)
-        await self.original_message.delete()
 
     async def one(self, interaction):
         await interaction.response.defer()
         await self.original_message.edit("한 곡만 추가합니다.")
         await self.music.queue(interaction, self.url.split("&list=")[0], msg=self.original_message)
-        await self.original_message.delete()
 
 class SearchView(View):
     def __init__(self, ctx, data, music):
