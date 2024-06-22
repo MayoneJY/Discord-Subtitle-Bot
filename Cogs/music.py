@@ -156,7 +156,10 @@ class Music():
                 await self.import_subtitles(data.data)
             except Exception as e:
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
-            data.data['author'] = ctx.author.global_name
+            try:
+                data.data['author'] = ctx.author.global_name
+            except:
+                data.data['author'] = ctx.user.global_name
             self.player.append(data)
 
     async def search(self, ctx, query):
