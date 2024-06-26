@@ -165,7 +165,7 @@ class Music():
 
                 tempTimes = []
                 tempSubtiles = []
-                temp = [" ", ""]
+                temp = [" ", "  "]
                 chk = False
                 timeChk = True
                 newLine = False
