@@ -3,7 +3,6 @@ from discord.commands import slash_command, Option
 from discord.ui import Select, View, Button
 from discord import Embed
 import discord
-from yt_dlp import YoutubeDL
 import asyncio
 import json
 import time as tt
@@ -11,110 +10,14 @@ from requests import Session
 import re
 from utils.error import CustomError
 from utils.view import SearchView
+from utils.youtube import YTDLSource
 
 guilds = {}
 
 SubtitleLanguages = ["ko", "en", "ja"]
 
-ytdl_format_options = {
-    'writesubtitles': True,
-    'subtitleslangs': SubtitleLanguages,
-    'writethumbnail' : True,
-    'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0'  # bind to ipv4 since ipv6 addresses cause issues sometimes
-}
-ydl_opts = {
-    'default_search': 'ytsearch',  # YouTube 검색 모드
-    'quiet': True,                # 출력 최소화
-    'extract_flat': True,         # 세부 정보 생략 (URL 목록만 추출)
-    'noplaylist': True,           # 플레이리스트 제외
-}
-
-ffmpeg_options = {
-    'options': '-vn'
-}
-
-ydl = YoutubeDL(ytdl_format_options)
-ydl2 = YoutubeDL(ydl_opts)
-
 def setup(app):
     app.add_cog(Core(app))
-
-    
-class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
-        super().__init__(source, volume)
-        self.data = data
-        self.title = data.get('title')
-        self.url = data.get('url')
-        self.duration = data.get('duration')
-
-    @classmethod
-    def from_url(cls, url, *, stream=False):
-        data = ydl.extract_info(url, download=not stream)
-        if 'entries' in data:
-            data = data['entries'][0]
-        filename = data['url'] if stream else ydl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-    
-    @classmethod
-    async def from_title(cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries']
-        if data == []:
-            return 1
-        else:
-            data2 = []
-            data2.append(data[0]['id'])
-            data2.append(data[0]['title'])
-            try:
-                if len(data[0]) >= 5:
-                    for i in range(1, 5):
-                        data2.append(data[i]['id'])
-                        data2.append(data[i]['title'])
-                else:
-                    for i in range(1, len(data[0])):
-                        data2.append(data[i]['id'])
-                        data2.append(data[i]['title'])
-            except:
-                pass
-
-            return data2
-    
-    
-    @classmethod
-    async def from_list(cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(url, download=stream))
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries']
-        if data == []:
-            return 1
-        else:
-            data2 = []
-            data2.append(data[0]['id'])
-            data2.append(data[0]['title'])
-            try:
-                for i in range(1, len(data[0])):
-                    data2.append(data[i]['id'])
-                    data2.append(data[i]['title'])
-            except:
-                pass
-
-            return data2
 
 class Music():
     def __init__(self, loop):
@@ -415,23 +318,23 @@ class Core(commands.Cog, name="뮤직봇"):
     @slash_command(name="join", description="음성 채널에 봇을 초대합니다.", guild_ids=guild_ids)
     async def join(self, ctx):
         if ctx.author.voice is None:
-            await ctx.send("음성 채널에 먼저 들어가주세요.")
+            await ctx.respond("음성 채널에 먼저 들어가주세요.")
             return
         if ctx.voice_client is not None:
             await ctx.voice_client.disconnect()
         await ctx.author.voice.channel.connect()
-        await ctx.send("음성 채널에 입장했습니다.")
+        await ctx.respond("음성 채널에 입장했습니다.")
 
     @slash_command(name="leave", description="음성 채널에서 봇을 퇴장시킵니다.")
     async def leave(self, ctx):
         if ctx.voice_client is None:
-            await ctx.send("음성 채널에 봇이 없습니다.")
+            await ctx.respond("음성 채널에 봇이 없습니다.")
             return
         if ctx.voice_client.is_playing():
             ctx.voice_client.stop()
             guilds[ctx.guild.id].reset()
         await ctx.voice_client.disconnect()
-        await ctx.send("음성 채널에서 퇴장했습니다.")
+        await ctx.respond("음성 채널에서 퇴장했습니다.")
 
     @slash_command(name="play", description="음악을 재생합니다.", guild_ids=guild_ids)
     async def play(self, interaction, url: str):
@@ -464,7 +367,7 @@ class Core(commands.Cog, name="뮤직봇"):
         if not ctx.voice_client.is_playing():
             raise CustomError("음악이 재생되고 있지 않습니다.")
         ctx.voice_client.stop()
-        await ctx.send("음악을 건너뛸게요.", delete_after=5)
+        await ctx.respond("음악을 건너뛸게요.", delete_after=5)
         
     
     @play.before_invoke
