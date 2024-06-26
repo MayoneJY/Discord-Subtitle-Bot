@@ -196,6 +196,8 @@ class Music():
                             tempSubtiles.append(line)
 
                         else:
+                            if tempSubtiles[-1] == line:
+                                continue
                             tempSubtiles[-1] += "\n" + line
 
                 tempSubtiles.insert(0, " ")
