@@ -185,6 +185,9 @@ class Music():
                                 if tempSubtiles[-1] != temp:
                                     tempSubtiles.append(temp)
                                     temp = ""
+                            if len(tempSubtiles) == 0:
+                                tempSubtiles.append(temp)
+                                temp = ""
 
                         #time
                         h = line[0:2]
