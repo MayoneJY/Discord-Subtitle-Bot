@@ -192,6 +192,8 @@ class Music():
                             if temp[0] == temp[1]:
                                 noLine = True
                             else:
+                                temp[0] = temp[1]
+                                temp[1] = ""
                                 tempTimes.append(time)
                                 chk = True
                         else:
