@@ -169,6 +169,7 @@ class Music():
                 chk = False
                 timeChk = True
                 newLine = False
+                noLine = False
                 for line in lines:
                     if line == "\n" or line == "":
                         continue
@@ -188,24 +189,25 @@ class Music():
                         t = line[9:10]
                         time = float(str(int(h) * 360 + int(m) * 60 + int(s)) + "." + t)
                         if len(tempTimes) == 0 or time - tempTimes[-1] > 1:
-                            tempTimes.append(time)
-                            chk = True
+                            if temp[0] == temp[1]:
+                                noLine = True
+                            else:
+                                tempTimes.append(time)
+                                chk = True
                         else:
                             chk = False
 
                     else:
-                        #subtitle
                         if newLine:
-                            if temp[0] != temp[1]:
-                                tempSubtiles.append(temp[0])
-                                temp.pop(0)
-                            else:
-                                tempTimes.pop()
-                        if chk:
-                            temp[1] = line
+                            tempSubtiles.append(temp[0])
+                            newLine = False
+                        #subtitle
+                        if not noLine:
+                            if chk:
+                                temp[1] = line
 
-                        else:
-                            temp[1] += "\n" + line
+                            else:
+                                temp[1] += "\n" + line
 
                 tempSubtiles.append(" ")
                 tempTimes.append(99999)
