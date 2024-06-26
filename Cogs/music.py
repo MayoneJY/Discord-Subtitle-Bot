@@ -199,11 +199,9 @@ class Music():
                             chk = False
                         else:
                             tempSubtiles[-1] += "\n" + line
-                i = 0
+                print(len(tempSubtiles), len(tempTimes))
+                i = 1
                 while i < len(tempSubtiles): 
-                    if i == 0:
-                        i += 1
-                        continue
 
                     if tempSubtiles[i] == tempSubtiles[i - 1]:
                         del tempSubtiles[i]
@@ -219,7 +217,6 @@ class Music():
                 tempSubtiles.append(" ")
                 tempTimes.append(99999)
                 tempTimes.append(99999)
-                print(len(tempSubtiles), len(tempTimes))
                 for i in range(len(tempTimes)):
                     subtitles_lang_temp.get('subtitles').append({'text': tempSubtiles[i], 'time': tempTimes[i]})
                 subtitles_temp.get('subtitles').append(subtitles_lang_temp)
