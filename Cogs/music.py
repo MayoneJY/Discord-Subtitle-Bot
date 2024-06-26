@@ -207,7 +207,7 @@ class Music():
                         del tempSubtiles[i]
                         del tempTimes[i]
 
-                    if tempTimes[i] - tempTimes[i - 1] < 1:
+                    elif tempTimes[i] - tempTimes[i - 1] < 1:
                         tempSubtiles[i - 1] += "\n" + tempSubtiles[i]
                         del tempSubtiles[i]
                         del tempTimes[i]
