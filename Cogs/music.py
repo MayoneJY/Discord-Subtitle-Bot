@@ -167,10 +167,7 @@ class Music():
                 tempSubtiles = []
                 chk = False
                 timeChk = True
-                secondLine = False
                 for line in lines:
-                    print(line)
-                    print(1)
                     if line == "\n" or line == "":
                         continue
                     if timeChk:
@@ -202,8 +199,8 @@ class Music():
                             chk = False
                         else:
                             tempSubtiles[-1] += "\n" + line
-
-                for i in range(len(tempSubtiles)):
+                i = 0
+                while i < len(tempSubtiles): 
                     if i == 0:
                         continue
 
