@@ -9,7 +9,7 @@ import time as tt
 from requests import Session
 import re
 from utils.error import CustomError
-from utils.view import SearchView
+from utils.view import SearchView, ListView
 from utils.youtube import YTDLSource
 
 guilds = {}
@@ -59,7 +59,10 @@ class Music():
                 await self.import_subtitles(data.data)
             except Exception as e:
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
-            data.data['author'] = ctx.author.global_name
+            try:
+                data.data['author'] = ctx.author.global_name
+            except:
+                data.data['author'] = ctx.user.global_name
             self.player.append(data)
 
     async def search(self, ctx, query):
@@ -77,20 +80,21 @@ class Music():
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)
 
-    async def list(self, ctx, url):
+    async def list(self, ctx, url, current=False, msg=None):
         
         urltemp = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
         data = await YTDLSource.from_list(urltemp)
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        # for i in range(0, len(data), 2):
-        #     if url.split("&v=")[1].split("&")[0] == data[i]:
-        #         data = data[i:]
-        #         break
+        if current:
+            for i in range(0, len(data), 2):
+                if url.split("v=")[1].split("&")[0] == data[i]:
+                    data = data[i:]
+                    break
         for i in range(0, len(data), 2):
             data[i] = f"https://www.youtube.com/watch?v={data[i]}"
-        await self.list_queue(ctx, data)
+        await self.list_queue(ctx, data, msg=msg)
 
     async def list_queue(self, ctx, url, msg=None):
         if msg:
@@ -104,7 +108,10 @@ class Music():
             await self.download(ctx, url[i])
             if tt.time() - time > 1:
                 time = tt.time()
-                await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
+                if msg:
+                    await msg.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
+                else:
+                    await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
             if not self.playing:
                 asyncio.create_task(self.play(ctx))
                 
@@ -126,7 +133,12 @@ class Music():
         await self.download(ctx, url)
 
         if msg:
-            await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+            try:
+                await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
+            except:
+                await msg.edit(content="재생목록에 추가되었습니다.")
+                tt.sleep(5)
+                await msg.delete()
         else:
             await test.edit("재생목록에 추가되었습니다.", delete_after=5)
 
@@ -337,16 +349,16 @@ class Core(commands.Cog, name="뮤직봇"):
         await ctx.respond("음성 채널에서 퇴장했습니다.")
 
     @slash_command(name="play", description="음악을 재생합니다.", guild_ids=guild_ids)
-    async def play(self, interaction, url: str):
+    async def play(self, ctx, url: str):
         
-        if not guilds.get(interaction.guild.id):
-            guilds[interaction.guild.id] = Music(self.loop)
+        if not guilds.get(ctx.guild.id):
+            guilds[ctx.guild.id] = Music(self.loop)
 
 
 
         # URL이 아닐 경우
         if not url.startswith("http"):
-            await guilds[interaction.guild.id].search(interaction, url)
+            await guilds[ctx.guild.id].search(ctx, url)
             return
         # 잘못된 URL
         elif not (url.startswith("https://www.youtube.com/") or \
@@ -356,9 +368,11 @@ class Core(commands.Cog, name="뮤직봇"):
             url.startswith("https://m.youtube.com/")):
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
-            await guilds[interaction.guild.id].list(interaction, url)
-
-        await guilds[interaction.guild.id].queue(interaction, url)
+            view = ListView(ctx, guilds[ctx.guild.id], url)
+            msg = await ctx.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
+            view.init(msg)
+        else:
+            await guilds[ctx.guild.id].queue(ctx, url)
 
     @slash_command(name="skip", description="음악을 건너뜁니다.", guild_ids=guild_ids)
     async def skip(self, ctx):

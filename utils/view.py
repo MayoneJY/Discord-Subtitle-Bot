@@ -2,6 +2,43 @@ from discord.ui import Select, View, Button
 from discord.ui.button import ButtonStyle
 from discord import Embed
 
+class ListView(View):
+    def __init__(self, ctx, music, url):
+        super().__init__(timeout=None)
+        self.ctx = ctx
+        self.music = music
+        self.url = url
+        
+        self.button1 = Button(style=ButtonStyle.primary, label="처음 곡부터 추가", custom_id="1")
+        self.button2 = Button(style=ButtonStyle.primary, label="현재 곡부터 추가", custom_id="2")
+        self.button3 = Button(style=ButtonStyle.primary, label="한 곡만 추가", custom_id="3")
+
+        self.button1.callback = self.first
+        self.button2.callback = self.current
+        self.button3.callback = self.one
+
+        self.add_item(self.button1)
+        self.add_item(self.button2)
+        self.add_item(self.button3)
+
+    def init(self, msg):
+        self.original_message = msg
+
+    async def first(self, interaction):
+        await interaction.response.defer()
+        await self.original_message.edit("처음 곡부터 추가합니다.", view=None)
+        await self.music.list(self.ctx, self.url, msg=self.original_message)
+
+    async def current(self, interaction):
+        await interaction.response.defer()
+        await self.original_message.edit("현재 곡부터 추가합니다.", view=None)
+        await self.music.list(self.ctx, self.url, current=True, msg=self.original_message)
+
+    async def one(self, interaction):
+        await interaction.response.defer()
+        await self.original_message.edit("한 곡만 추가합니다.")
+        await self.music.queue(self.ctx, self.url.split("&list=")[0], msg=self.original_message)
+
 class SearchView(View):
     def __init__(self, ctx, data, music):
         super().__init__(timeout=None)
