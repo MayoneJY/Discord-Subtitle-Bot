@@ -165,12 +165,11 @@ class Music():
 
                 tempTimes = []
                 tempSubtiles = []
-                temp = [" ", "  "]
                 chk = False
                 timeChk = True
-                newLine = False
-                noLine = False
                 for line in lines:
+                    print(line)
+                    print(1)
                     if line == "\n" or line == "":
                         continue
                     if timeChk:
@@ -182,36 +181,26 @@ class Music():
 
                     if '-->' in line:
                         #time
-                        newLine = True
                         h = line[0:2]
                         m = line[3:5]
                         s = line[6:8]
                         t = line[9:10]
                         time = float(str(int(h) * 360 + int(m) * 60 + int(s)) + "." + t)
                         if len(tempTimes) == 0 or time - tempTimes[-1] > 1:
-                            if temp[0] == temp[1]:
-                                noLine = True
-                            else:
-                                temp[0] = temp[1]
-                                temp[1] = ""
-                                tempTimes.append(time)
-                                chk = True
+                            tempTimes.append(time)
+                            chk = True
                         else:
                             chk = False
 
                     else:
-                        if newLine:
-                            tempSubtiles.append(temp[0])
-                            newLine = False
                         #subtitle
-                        if not noLine:
-                            if chk:
-                                temp[1] = line
+                        if chk:
+                            tempSubtiles.append(line)
 
-                            else:
-                                temp[1] += "\n" + line
                         else:
-                            noLine = False
+                            tempSubtiles[-1] += "\n" + line
+
+                tempSubtiles.insert(0, " ")
                 tempSubtiles.append(" ")
                 tempTimes.append(99999)
                 tempTimes.append(99999)
