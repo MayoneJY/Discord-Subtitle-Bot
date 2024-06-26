@@ -181,9 +181,10 @@ class Music():
                     if '-->' in line:
                         # subtitle
                         if temp != "":
-                            if tempSubtiles[-1] != temp:
-                                tempSubtiles.append(temp)
-                                temp = ""
+                            if len(tempSubtiles) != 0:
+                                if tempSubtiles[-1] != temp:
+                                    tempSubtiles.append(temp)
+                                    temp = ""
 
                         #time
                         h = line[0:2]
