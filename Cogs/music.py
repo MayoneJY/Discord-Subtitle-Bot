@@ -167,6 +167,7 @@ class Music():
                 tempSubtiles = []
                 chk = False
                 timeChk = True
+                temp = ""
                 for line in lines:
                     if line == "\n" or line == "":
                         continue
@@ -178,6 +179,12 @@ class Music():
 
 
                     if '-->' in line:
+                        # subtitle
+                        if temp != "":
+                            if tempSubtiles[-1] != temp:
+                                tempSubtiles.append(temp)
+                                temp = ""
+
                         #time
                         h = line[0:2]
                         m = line[3:5]
@@ -193,12 +200,10 @@ class Music():
                     else:
                         #subtitle
                         if chk:
-                            tempSubtiles.append(line)
+                            temp = line
 
                         else:
-                            if tempSubtiles[-1] == line:
-                                continue
-                            tempSubtiles[-1] += "\n" + line
+                            temp += "\n" + line
 
                 tempSubtiles.insert(0, " ")
                 tempSubtiles.append(" ")
