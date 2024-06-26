@@ -206,11 +206,13 @@ class Music():
                     if tempSubtiles[i] == tempSubtiles[i - 1]:
                         del tempSubtiles[i]
                         del tempTimes[i]
+                        i -= 1
 
                     elif tempTimes[i] - tempTimes[i - 1] < 1:
                         tempSubtiles[i - 1] += "\n" + tempSubtiles[i]
                         del tempSubtiles[i]
                         del tempTimes[i]
+                        i -= 1
                     i += 1
 
                 tempSubtiles.insert(0, " ")
