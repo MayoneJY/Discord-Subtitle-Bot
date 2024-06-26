@@ -210,7 +210,8 @@ class Music():
 
                             else:
                                 temp[1] += "\n" + line
-
+                        else:
+                            noLine = False
                 tempSubtiles.append(" ")
                 tempTimes.append(99999)
                 tempTimes.append(99999)
