@@ -215,6 +215,7 @@ class Music():
 
                 tempSubtiles.insert(0, " ")
                 tempSubtiles.append(" ")
+                tempSubtiles.append(" ")
                 tempTimes.append(99999)
                 tempTimes.append(99999)
                 print("after", len(tempSubtiles), len(tempTimes))
