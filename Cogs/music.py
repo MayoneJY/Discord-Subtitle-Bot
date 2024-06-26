@@ -14,7 +14,6 @@ from utils.youtube import YTDLSource
 
 guilds = {}
 
-SubtitleLanguages = ["ko", "en", "ja"]
 
 def setup(app):
     app.add_cog(Core(app))

@@ -1,6 +1,9 @@
 
 from yt_dlp import YoutubeDL
+import discord
+import asyncio
 
+SubtitleLanguages = ["ko", "en", "ja"]
 ytdl_format_options = {
     'writesubtitles': True,
     'subtitleslangs': SubtitleLanguages,
