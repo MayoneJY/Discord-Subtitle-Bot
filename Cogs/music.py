@@ -167,6 +167,7 @@ class Music():
                 tempSubtiles = []
                 chk = False
                 timeChk = True
+                secondLine = False
                 for line in lines:
                     print(line)
                     print(1)
@@ -186,19 +187,34 @@ class Music():
                         s = line[6:8]
                         t = line[9:10]
                         time = float(str(int(h) * 360 + int(m) * 60 + int(s)) + "." + t)
-                        if len(tempTimes) == 0 or time - tempTimes[-1] > 1:
-                            tempTimes.append(time)
-                            chk = True
-                        else:
-                            chk = False
+                        tempTimes.append(time)
+                        chk = True
+                        # if len(tempTimes) == 0 or time - tempTimes[-1] > 1:
+                        #     tempTimes.append(time)
+                        #     chk = True
+                        # else:
+                        #     chk = False
 
                     else:
                         #subtitle
                         if chk:
                             tempSubtiles.append(line)
-
+                            chk = False
                         else:
                             tempSubtiles[-1] += "\n" + line
+
+                for i in range(len(tempSubtiles)):
+                    if i == 0:
+                        continue
+
+                    if tempSubtiles[i] == tempSubtiles[i - 1]:
+                        del tempSubtiles[i]
+                        del tempTimes[i]
+
+                    if tempTimes[i] - tempTimes[i - 1] < 1:
+                        tempSubtiles[i - 1] += "\n" + tempSubtiles[i]
+                        del tempSubtiles[i]
+                        del tempTimes[i]
 
                 tempSubtiles.insert(0, " ")
                 tempSubtiles.append(" ")
