@@ -202,6 +202,7 @@ class Music():
                 i = 0
                 while i < len(tempSubtiles): 
                     if i == 0:
+                        i += 1
                         continue
 
                     if tempSubtiles[i] == tempSubtiles[i - 1]:
@@ -212,7 +213,6 @@ class Music():
                         tempSubtiles[i - 1] += "\n" + tempSubtiles[i]
                         del tempSubtiles[i]
                         del tempTimes[i]
-                    i += 1
 
                 tempSubtiles.insert(0, " ")
                 tempSubtiles.append(" ")
