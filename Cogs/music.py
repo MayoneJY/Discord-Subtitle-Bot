@@ -165,9 +165,10 @@ class Music():
 
                 tempTimes = []
                 tempSubtiles = []
+                temp = [" ", ""]
                 chk = False
                 timeChk = True
-                temp = ""
+                newLine = False
                 for line in lines:
                     if line == "\n" or line == "":
                         continue
@@ -179,20 +180,8 @@ class Music():
 
 
                     if '-->' in line:
-                        # subtitle
-                        if temp != "":
-                            if len(tempSubtiles) != 0:
-                                if tempSubtiles[-1] != temp:
-                                    tempSubtiles.append(temp)
-                                    temp = ""
-                            if len(tempSubtiles) == 0:
-                                tempSubtiles.append(temp)
-                                temp = ""
-
-                            if len(tempSubtiles) < len(tempTimes):
-                                del tempTimes[-1]
-
                         #time
+                        newLine = True
                         h = line[0:2]
                         m = line[3:5]
                         s = line[6:8]
@@ -206,13 +195,18 @@ class Music():
 
                     else:
                         #subtitle
+                        if newLine:
+                            if temp[0] != temp[1]:
+                                tempSubtiles.append(temp[0])
+                                temp.pop(0)
+                            else:
+                                tempTimes.pop()
                         if chk:
-                            temp = line
+                            temp[1] = line
 
                         else:
-                            temp += "\n" + line
+                            temp[1] += "\n" + line
 
-                tempSubtiles.insert(0, " ")
                 tempSubtiles.append(" ")
                 tempTimes.append(99999)
                 tempTimes.append(99999)
