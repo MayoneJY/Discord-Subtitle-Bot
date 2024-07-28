@@ -4,13 +4,11 @@ from discord.ui import Select, View, Button
 from discord import Embed
 import discord
 import asyncio
-import json
 import time as tt
-from requests import Session
-import re
 from utils.error import CustomError
 from utils.view import SearchView, ListView
 from utils.youtube import YTDLSource
+from utils.subtitle import Subtitle
 
 guilds = {}
 
@@ -55,7 +53,9 @@ class Music():
             except Exception as e:
                 raise CustomError(f"다운로드 중 오류가 발생했습니다. {e}")
             try:
-                await self.import_subtitles(data.data)
+                sub = await Subtitle.import_subtitles(data.data)
+                if sub:
+                    self.subtitles.append(sub)
             except Exception as e:
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
             try:
@@ -144,90 +144,6 @@ class Music():
         if not self.playing:
             await self.play(ctx)
 
-    async def import_subtitles(self, info):
-        clean = '<.*?>'
-        subtitles_temp = {'title': info.get('title'), 'subtitles': []}
-        has_subtitles = False
-        f_t = tt.time()
-        with Session() as session:
-            for k, subtitles_list in info.get('subtitles', {}).items():
-                if '-' in k and len(k.split('-')[1]) > 2:
-                    continue
-                if k == 'live_chat':
-                    continue
-                has_subtitles = True
-                subtitles_lang_temp = {'lang': k, 'subtitles': []}
-                url = [item['url'] for item in subtitles_list if item['ext'] == 'vtt']
-                t_t = tt.time()
-                f = re.sub(clean, '', session.get(url[0]).text).replace("\u200b", "")
-                print("언어: " + k + " - " + str(tt.time() - t_t) + "초 걸림")
-                lines = f.splitlines()
-
-                tempTimes = []
-                tempSubtiles = []
-                chk = False
-                timeChk = True
-                for line in lines:
-                    if line == "\n" or line == "":
-                        continue
-                    if timeChk:
-                        if '-->' not in line:
-                            continue
-                        else:
-                            timeChk = False
-
-
-                    if '-->' in line:
-                        #time
-                        h = line[0:2]
-                        m = line[3:5]
-                        s = line[6:8]
-                        t = line[9:10]
-                        time = float(str(int(h) * 360 + int(m) * 60 + int(s)) + "." + t)
-                        tempTimes.append(time)
-                        chk = True
-                        # if len(tempTimes) == 0 or time - tempTimes[-1] > 1:
-                        #     tempTimes.append(time)
-                        #     chk = True
-                        # else:
-                        #     chk = False
-
-                    else:
-                        #subtitle
-                        if chk:
-                            tempSubtiles.append(line)
-                            chk = False
-                        else:
-                            tempSubtiles[-1] += "\n" + line
-                print("before", len(tempSubtiles), len(tempTimes))
-                i = 1
-                while i < len(tempSubtiles): 
-
-                    if tempSubtiles[i] == tempSubtiles[i - 1]:
-                        del tempSubtiles[i]
-                        del tempTimes[i]
-                        i -= 1
-
-                    elif tempTimes[i] - tempTimes[i - 1] < 1:
-                        tempSubtiles[i - 1] += "\n" + tempSubtiles[i]
-                        del tempSubtiles[i]
-                        del tempTimes[i]
-                        i -= 1
-                    i += 1
-
-                tempSubtiles.insert(0, " ")
-                tempSubtiles.append(" ")
-                tempSubtiles.append(" ")
-                tempTimes.append(99999)
-                tempTimes.append(99999)
-                print("after", len(tempSubtiles), len(tempTimes))
-                for i in range(len(tempTimes)):
-                    subtitles_lang_temp.get('subtitles').append({'text': tempSubtiles[i], 'time': tempTimes[i]})
-                subtitles_temp.get('subtitles').append(subtitles_lang_temp)
-        if has_subtitles:
-            self.subtitles.append(subtitles_temp)
-        print("총 " + str(tt.time() - f_t) + "초 걸림")
-
 
     async def play(self, ctx):
         if self.playing:
@@ -240,7 +156,6 @@ class Music():
             try:
                 self.subtitles_index = 0
                 self.now_time = 0
-                ctx.voice_client.play(self.player[self.current])
                 try:
                     current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == self.player[self.current].title), None)
                 except:
@@ -257,12 +172,25 @@ class Music():
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
                 sendmessage = await ctx.send(embed=embedtitle)
 
+                language_reactions = {
+                    'ko': "🇰🇷",
+                    'en': "🇺🇸",
+                    'ja': "🇯🇵",
+                    'zh-CN': "🇨🇳",
+                    'zh-TW': "🇹🇼"
+                }
+                for sub in current_subtitles.get('subtitles', []):
+                    lang = sub.get('lang')
+                    if lang in language_reactions:
+                        await sendmessage.add_reaction(language_reactions[lang])
+
+                ctx.voice_client.play(self.player[self.current])
 
 
                 subtitle_change = True
                 message = ""
                 subtitle_current_lang = self.subtitles_language
-                print(f".{current_subtitles}.")
+                # print(f".{current_subtitles}.")
                 subtitle = None
                 if current_subtitles:
                     subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
@@ -278,41 +206,37 @@ class Music():
                         continue
                     time = tt.time() - self.now_time
                     if subtitle:
+                        if subtitle_current_lang != self.subtitles_language:
+                            self.subtitles_index = 0
+                            subtitle_change = True
+                            subtitle_current_lang = self.subtitles_language
+                            subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
                         for i in range(self.subtitles_index, len(subtitle['subtitles'])):
                             if time >= subtitle['subtitles'][i]['time']:
+                                print(time, subtitle['subtitles'][i]['time'])
                                 self.subtitles_index += 1
                                 subtitle_change = True
-                                break
-
-                    embedtitle.remove_field(0)
-                    embedtitle.remove_field(0)
+                    
+                    embedtitle.clear_fields()
                     embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
                     # 다음곡
                     if self.current + 1 < len(self.player):
                         embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
                     else:
                         embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
-
                     # 자막 출력
                     if subtitle:
                         if current_subtitles and subtitle_change:
                             subtitle_change = False
                             print("change")
                             
-
-                            # TODO: 자막 언어 바뀔 때만 작동하도록 수정
-                            if subtitle_current_lang != self.subtitles_language:
-                                self.subtitles_language = subtitle_current_lang
-                                subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0]) 
-                            
-                            embedtitle.remove_field(2)
                             message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
 
                             if len(subtitle['subtitles']) > self.subtitles_index + 1:
                                 message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
                             else:
                                 message += "```brainfuck\n End \n ```"
-                            embedtitle.add_field(name="자막", value=message, inline=False)
+                            embedtitle.add_field(name="자막", value=message[:900], inline=False)
                             await sendmessage.edit(embed=embedtitle)
                     else:
                         await asyncio.sleep(0.5)
@@ -418,4 +342,26 @@ class Core(commands.Cog, name="뮤직봇"):
     # async def check_guilds(self, ctx):
     #     if not guilds.get(ctx.guild.id):
     #         guilds[ctx.guild.id] = Music()
+
+
+    
+    @commands.Cog.listener()
+    async def on_reaction_add(self, reaction, user):
+        if user.bot:
+            return
+        
+        if reaction.message.author.bot:
+            print(reaction.emoji, reaction.emoji == "🇰🇷")
+            if reaction.emoji == "🇰🇷":
+                guilds[reaction.message.guild.id].subtitles_language = "ko"
+            elif reaction.emoji == "🇺🇸":
+                guilds[reaction.message.guild.id].subtitles_language = "en"
+            elif reaction.emoji == "🇯🇵":
+                guilds[reaction.message.guild.id].subtitles_language = "ja"
+            elif reaction.emoji == "🇨🇳":
+                guilds[reaction.message.guild.id].subtitles_language = "zh-CN"
+            elif reaction.emoji == "🇹🇼":
+                guilds[reaction.message.guild.id].subtitles_language = "zh-TW"
+            await reaction.message.remove_reaction(reaction.emoji, user)
+        return
         
