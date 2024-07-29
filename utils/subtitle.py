@@ -22,7 +22,7 @@ class Subtitle:
                 url = [item['url'] for item in subtitles_list if item['ext'] == 'vtt']
                 t_t = tt.time()
                 f = re.sub(clean, '', session.get(url[0]).text).replace("\u200b", "")
-                print("언어: " + k + " - " + str(tt.time() - t_t) + "초 걸림")
+                # print("언어: " + k + " - " + str(tt.time() - t_t) + "초 걸림")
                 lines = f.splitlines()
 
                 tempTimes = []
@@ -66,7 +66,7 @@ class Subtitle:
                             chk = False
                         else:
                             tempSubtiles[-1] += "\n" + line.strip()
-                print("before", len(tempSubtiles), len(tempTimes))
+                # print("before", len(tempSubtiles), len(tempTimes))
                 i = 1
                 while i < len(tempSubtiles): 
 
@@ -88,12 +88,12 @@ class Subtitle:
                 tempTimes.append(99999)
                 tempTimes.append(99999)
                 tempTimes.append(99999)
-                print("after", len(tempSubtiles), len(tempTimes))
+                # print("after", len(tempSubtiles), len(tempTimes))
                 # print(tempSubtiles, tempTimes)
                 for i in range(len(tempTimes)):
                     subtitles_lang_temp.get('subtitles').append({'text': tempSubtiles[i], 'time': tempTimes[i]})
                 subtitles_temp.get('subtitles').append(subtitles_lang_temp)
-        print("총 " + str(tt.time() - f_t) + "초 걸림")
+        # print("총 " + str(tt.time() - f_t) + "초 걸림")
         if has_subtitles:
             return subtitles_temp
         else:

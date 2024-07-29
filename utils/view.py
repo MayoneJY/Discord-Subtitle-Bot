@@ -105,3 +105,53 @@ class SearchView(View):
         await self.original_message.delete()
 
         
+class playControlPanel(View):
+    def __init__(self, ctx, music):
+        super().__init__(timeout=None)
+        self.ctx = ctx
+        self.music = music
+
+        self.prevButton = Button(style=ButtonStyle.gray, label="이전곡", custom_id="prev", emoji="⏮️")
+        self.pauseButton = Button(style=ButtonStyle.gray, label="일시정지", custom_id="pause", emoji="⏸️")
+        self.resumeButton = Button(style=ButtonStyle.danger, label="다시재생", custom_id="resume", emoji="▶️")
+        self.skipButton = Button(style=ButtonStyle.gray, label="다음곡", custom_id="skip", emoji="⏭️")
+        self.stopButton = Button(style=ButtonStyle.danger, label="정지", custom_id="stop", emoji="⏹️")
+        self.repeatButton = Button(style=ButtonStyle.gray, label="반복 안함", custom_id="repeat", emoji="➡️")
+
+        self.prevButton.callback = self.prev
+        self.pauseButton.callback = self.pause
+        self.resumeButton.callback = self.resume
+        self.skipButton.callback = self.skip
+        self.stopButton.callback = self.stop
+        self.repeatButton.callback = self.repeat
+
+        self.add_item(self.prevButton)
+        self.add_item(self.pauseButton)
+        # self.add_item(self.resumeButton)
+        self.add_item(self.skipButton)
+        self.add_item(self.stopButton)
+        self.add_item(self.repeatButton)
+
+    async def prev(self, interaction):
+        await interaction.response.defer()
+        # await self.music.prev(self.ctx)
+
+    async def pause(self, interaction):
+        await interaction.response.defer()
+        # await self.music.pause(self.ctx)
+
+    async def resume(self, interaction):
+        await interaction.response.defer()
+        # await self.music.resume(self.ctx)
+
+    async def skip(self, interaction):
+        await interaction.response.defer()
+        await self.music.commandSkip(self.ctx)
+
+    async def stop(self, interaction):
+        await interaction.response.defer()
+        await self.music.commandStop(self.ctx)
+
+    async def repeat(self, interaction):
+        await interaction.response.defer()
+        # await self.music.repeat(self.ctx)

@@ -83,7 +83,7 @@ async def on_application_command_error(ctx, error):
 
         await ctx.send(embed=embed)
     elif isinstance(error, DiscordException):
-        if str(error) in "CustomError: ":
+        if "CustomError: " in str(error) :
             embed = discord.Embed(color=0xFE676E)
             embed.add_field(name="오류 발생", value=f"{str(error).split('CustomError: ')[1]}")
             await ctx.send(embed=embed)
