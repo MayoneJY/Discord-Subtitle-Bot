@@ -32,7 +32,7 @@ class Core(commands.Cog, name="뮤직봇"):
     @slash_command(name="stop", description="노래 정지 후 음성 채널에서 봇을 퇴장시킵니다.")
     async def stop(self, ctx):
         if guilds.get(ctx.guild.id):
-            guilds[ctx.guild.id].commandStop(ctx)
+            guilds[ctx.guild.id].command_stop(ctx)
         else:
             raise CustomError("음악이 재생되고 있지 않습니다.")
 
@@ -42,14 +42,14 @@ class Core(commands.Cog, name="뮤직봇"):
         if not guilds.get(ctx.guild.id):
             guilds[ctx.guild.id] = Music(self.loop)
 
-        await guilds[ctx.guild.id].commandPlay(ctx, url)
+        await guilds[ctx.guild.id].command_play(ctx, url)
 
 
     @slash_command(name="skip", description="음악을 건너뜁니다.", guild_ids=guild_ids)
     async def skip(self, ctx):
         if not guilds.get(ctx.guild.id):
             raise CustomError("음악이 재생되고 있지 않습니다.")
-        await guilds[ctx.guild.id].commandSkip(ctx)
+        await guilds[ctx.guild.id].command_skip(ctx)
         
     
     @play.before_invoke

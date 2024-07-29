@@ -110,11 +110,10 @@ class playControlPanel(View):
         super().__init__(timeout=None)
         self.ctx = ctx
         self.music = music
-
         self.pauseButtonView = Button(style=ButtonStyle.gray, label="일시정지", custom_id="pause", emoji="⏸️")
         self.resumeButtonView = Button(style=ButtonStyle.green, label="다시재생", custom_id="resume", emoji="▶️")
 
-        self.prevButton = Button(style=ButtonStyle.gray, label="이전곡", custom_id="prev", emoji="⏮️")
+        self.prevButton = Button(style=ButtonStyle.gray, label="이전곡", custom_id="prev", emoji="⏮️", disabled=True if self.music.current == 0 else False)
         self.pauseButton = self.pauseButtonView
         self.skipButton = Button(style=ButtonStyle.gray, label="다음곡", custom_id="skip", emoji="⏭️")
         self.stopButton = Button(style=ButtonStyle.danger, label="정지", custom_id="stop", emoji="⏹️")
@@ -123,6 +122,7 @@ class playControlPanel(View):
         self.init()
 
     def init(self):
+
         self.prevButton.callback = self.prev
         self.pauseButton.callback = self.pause
         self.skipButton.callback = self.skip
@@ -140,11 +140,11 @@ class playControlPanel(View):
 
     async def prev(self, interaction):
         await interaction.response.defer()
-        # await self.music.prev(self.ctx)
+        await self.music.command_prev(self.ctx)
 
     async def pause(self, interaction):
         await interaction.response.defer(invisible=True)
-        await self.music.commandPause(self.ctx)
+        await self.music.command_pause(self.ctx)
         self.pauseButton.callback = self.resume
         self.pauseButton.label = "다시재생"
         self.pauseButton.style = ButtonStyle.green
@@ -153,7 +153,7 @@ class playControlPanel(View):
 
     async def resume(self, interaction):
         await interaction.response.defer(invisible=True)
-        await self.music.commandResume(self.ctx)
+        await self.music.command_resume(self.ctx)
         self.pauseButton.callback = self.pause
         self.pauseButton.label = "일시정지"
         self.pauseButton.style = ButtonStyle.gray
@@ -162,11 +162,11 @@ class playControlPanel(View):
 
     async def skip(self, interaction):
         await interaction.response.defer()
-        await self.music.commandSkip(self.ctx)
+        await self.music.command_skip(self.ctx)
 
     async def stop(self, interaction):
         await interaction.response.defer()
-        await self.music.commandStop(self.ctx)
+        await self.music.command_stop(self.ctx)
 
     async def repeat(self, interaction):
         await interaction.response.defer()

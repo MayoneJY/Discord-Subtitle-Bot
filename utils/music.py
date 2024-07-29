@@ -256,7 +256,7 @@ class Music():
 
         self.playing = False
 
-    async def commandPlay(self, ctx, url):
+    async def command_play(self, ctx, url):
         # URL이 아닐 경우
         if not url.startswith("http"):
             await self.search(ctx, url)
@@ -275,7 +275,7 @@ class Music():
         else:
             await self.queue(ctx, url)
 
-    async def commandSkip(self, ctx):
+    async def command_skip(self, ctx):
         if ctx.voice_client is None:
             raise CustomError("음성 채널에 봇이 없습니다.")
         if not ctx.voice_client.is_playing():
@@ -283,7 +283,7 @@ class Music():
         ctx.voice_client.stop()
         await ctx.respond("음악을 건너뛸게요.", delete_after=5)
 
-    async def commandStop(self, ctx):
+    async def command_stop(self, ctx):
         if ctx.voice_client is None:
             await ctx.respond("음성 채널에 봇이 없습니다.")
             return
@@ -293,7 +293,7 @@ class Music():
         await ctx.voice_client.disconnect()
         await ctx.respond("음성 채널에서 퇴장했습니다.")
 
-    async def commandPause(self, ctx):
+    async def command_pause(self, ctx):
         self.pasue_time = tt.time()
         if ctx.voice_client is None:
             raise CustomError("음성 채널에 봇이 없습니다.")
@@ -302,7 +302,7 @@ class Music():
         ctx.voice_client.pause()
         # await ctx.respond("음악을 일시정지했습니다.", delete_after=5)
 
-    async def commandResume(self, ctx):
+    async def command_resume(self, ctx):
         self.pasue_time = tt.time() - self.pasue_time
         if ctx.voice_client is None:
             raise CustomError("음성 채널에 봇이 없습니다.")
@@ -310,3 +310,14 @@ class Music():
             raise CustomError("음악이 재생되고 있습니다.")
         ctx.voice_client.resume()
         # await ctx.respond("음악을 다시 재생합니다.", delete_after=5)
+
+    async def command_prev(self, ctx):
+        if ctx.voice_client is None:
+            raise CustomError("음성 채널에 봇이 없습니다.")
+        if not ctx.voice_client.is_playing():
+            raise CustomError("음악이 재생되고 있지 않습니다.")
+        if self.current == 0:
+            raise CustomError("이전 곡이 없습니다.")
+        self.current -= 2
+        ctx.voice_client.stop()
+        # await ctx.respond("이전 곡을 재생합니다.", delete_after=5)
