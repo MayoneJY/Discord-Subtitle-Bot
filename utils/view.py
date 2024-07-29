@@ -111,38 +111,54 @@ class playControlPanel(View):
         self.ctx = ctx
         self.music = music
 
+        self.pauseButtonView = Button(style=ButtonStyle.gray, label="일시정지", custom_id="pause", emoji="⏸️")
+        self.resumeButtonView = Button(style=ButtonStyle.green, label="다시재생", custom_id="resume", emoji="▶️")
+
         self.prevButton = Button(style=ButtonStyle.gray, label="이전곡", custom_id="prev", emoji="⏮️")
-        self.pauseButton = Button(style=ButtonStyle.gray, label="일시정지", custom_id="pause", emoji="⏸️")
-        self.resumeButton = Button(style=ButtonStyle.danger, label="다시재생", custom_id="resume", emoji="▶️")
+        self.pauseButton = self.pauseButtonView
         self.skipButton = Button(style=ButtonStyle.gray, label="다음곡", custom_id="skip", emoji="⏭️")
         self.stopButton = Button(style=ButtonStyle.danger, label="정지", custom_id="stop", emoji="⏹️")
         self.repeatButton = Button(style=ButtonStyle.gray, label="반복 안함", custom_id="repeat", emoji="➡️")
 
+        self.init()
+
+    def init(self):
         self.prevButton.callback = self.prev
         self.pauseButton.callback = self.pause
-        self.resumeButton.callback = self.resume
         self.skipButton.callback = self.skip
         self.stopButton.callback = self.stop
         self.repeatButton.callback = self.repeat
 
         self.add_item(self.prevButton)
         self.add_item(self.pauseButton)
-        # self.add_item(self.resumeButton)
         self.add_item(self.skipButton)
         self.add_item(self.stopButton)
         self.add_item(self.repeatButton)
+
+    def initMsg(self, msg):
+        self.msg = msg
 
     async def prev(self, interaction):
         await interaction.response.defer()
         # await self.music.prev(self.ctx)
 
     async def pause(self, interaction):
-        await interaction.response.defer()
-        # await self.music.pause(self.ctx)
+        await interaction.response.defer(invisible=True)
+        await self.music.commandPause(self.ctx)
+        self.pauseButton.callback = self.resume
+        self.pauseButton.label = "다시재생"
+        self.pauseButton.style = ButtonStyle.green
+        self.pauseButton.emoji = "▶️"
+        await self.msg.edit(view=self)
 
     async def resume(self, interaction):
-        await interaction.response.defer()
-        # await self.music.resume(self.ctx)
+        await interaction.response.defer(invisible=True)
+        await self.music.commandResume(self.ctx)
+        self.pauseButton.callback = self.pause
+        self.pauseButton.label = "일시정지"
+        self.pauseButton.style = ButtonStyle.gray
+        self.pauseButton.emoji = "⏸️"
+        await self.msg.edit(view=self)
 
     async def skip(self, interaction):
         await interaction.response.defer()

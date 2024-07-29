@@ -19,6 +19,7 @@ class Music():
         self.player = [] # 음악 플레이어 - discord.FFmpegPCMAudio
         self.volume = 0.1 # 볼륨
         self.now_time = 0 # 현재 재생 시간
+        self.pasue_time = 0
 
     def reset(self):
         self.music_loop = False
@@ -29,6 +30,7 @@ class Music():
         self.current = 0
         self.player = []
         self.now_time = 0
+        self.pasue_time = 0
 
     async def download(self, ctx, url):
         check_player = False
@@ -161,7 +163,9 @@ class Music():
                     embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
-                sendmessage = await ctx.send(embed=embedtitle, view=playControlPanel(ctx, self))
+                view = playControlPanel(ctx, self)
+                sendmessage = await ctx.send(embed=embedtitle, view=view)
+                view.initMsg(sendmessage)
 
                 language_reactions = {
                     'ko': "🇰🇷",
@@ -192,11 +196,14 @@ class Music():
                 while True: # 음악이 재생중일 때
                     if not ctx.voice_client:
                         break
-                    if not ctx.voice_client.is_playing(): # 음악이 재생중이지 않을 때
-                        break
                     if ctx.voice_client.is_paused(): # 음악이 일시정지 상태일 때
                         await asyncio.sleep(0.1) 
                         continue
+                    if not ctx.voice_client.is_playing(): # 음악이 재생중이지 않을 때
+                        break
+                    if self.pasue_time != 0:
+                        self.now_time += self.pasue_time
+                        self.pasue_time = 0
                     time = tt.time() - self.now_time
                     if subtitle:
                         if subtitle_current_lang != self.subtitles_language:
@@ -285,3 +292,21 @@ class Music():
             self.reset()
         await ctx.voice_client.disconnect()
         await ctx.respond("음성 채널에서 퇴장했습니다.")
+
+    async def commandPause(self, ctx):
+        self.pasue_time = tt.time()
+        if ctx.voice_client is None:
+            raise CustomError("음성 채널에 봇이 없습니다.")
+        if not ctx.voice_client.is_playing():
+            raise CustomError("음악이 재생되고 있지 않습니다.")
+        ctx.voice_client.pause()
+        # await ctx.respond("음악을 일시정지했습니다.", delete_after=5)
+
+    async def commandResume(self, ctx):
+        self.pasue_time = tt.time() - self.pasue_time
+        if ctx.voice_client is None:
+            raise CustomError("음성 채널에 봇이 없습니다.")
+        if ctx.voice_client.is_playing():
+            raise CustomError("음악이 재생되고 있습니다.")
+        ctx.voice_client.resume()
+        # await ctx.respond("음악을 다시 재생합니다.", delete_after=5)
