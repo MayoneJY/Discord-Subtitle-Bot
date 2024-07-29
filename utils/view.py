@@ -68,8 +68,8 @@ class SearchView(View):
             self.original_message = await interaction.channel.fetch_message(interaction.message.id)
 
     async def embed(self):
-        embed = Embed(title=self.data[self.page * 2 + 1], url=f"https://www.youtube.com/watch?v={self.data[self.page*2]}")
-        embed.set_image(url=f"https://i.ytimg.com/vi/{self.data[self.page*2]}/hqdefault.jpg")
+        embed = Embed(title=self.data['title'][self.page], url=self.data['url'][self.page])
+        embed.set_image(url=self.data['thumbnail'][self.page])
         await self.original_message.edit(embed=embed)
 
 
@@ -97,7 +97,7 @@ class SearchView(View):
         await interaction.response.defer()
         await self.init(interaction)
         # await self.original_message.delete()
-        await self.music.queue(self.ctx, f"https://www.youtube.com/watch?v={self.data[self.page*2]}", self.original_message)
+        await self.music.queue(self.ctx, self.data['url'][self.page], self.original_message)
 
     async def cancel(self, interaction):
         await interaction.response.defer()

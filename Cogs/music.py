@@ -38,7 +38,7 @@ class Core(commands.Cog, name="뮤직봇"):
 
     @slash_command(name="play", description="음악을 재생합니다.", guild_ids=guild_ids)
     async def play(self, ctx, url: str):
-        await ctx.respond("음악을 추가합니다.", delete_after=2)
+        await ctx.respond("로딩중...", delete_after=2)
         if not guilds.get(ctx.guild.id):
             guilds[ctx.guild.id] = Music(self.loop)
 

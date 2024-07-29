@@ -55,7 +55,7 @@ class YTDLSource(discord.PCMVolumeTransformer):
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
     
     @classmethod
-    async def from_title(cls, url, *, loop=None, stream=False):
+    async def from_title(cls, url, author, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch5:{url}", download=stream))
         if 'entries' in data:
@@ -64,26 +64,50 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if data == []:
             return 1
         else:
-            data2 = []
-            data2.append(data[0]['id'])
-            data2.append(data[0]['title'])
+            data2 = {'url': [], 'title': [], 'thumbnail': [], 'author': []}
+            data2['url'].append(data[0]['id'])
+            data2['title'].append(data[0]['title'])
+            data2['thumbnail'].append(data[0]['thumbnails'][-1]['url'])
+            data2['author'].append(author)
             try:
                 if len(data[0]) >= 5:
                     for i in range(1, 5):
-                        data2.append(data[i]['id'])
-                        data2.append(data[i]['title'])
+                        data2['url'].append(data[i]['id'])
+                        data2['title'].append(data[i]['title'])
+                        data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
+                        data2['author'].append(author)
                 else:
                     for i in range(1, len(data[0])):
-                        data2.append(data[i]['id'])
-                        data2.append(data[i]['title'])
+                        data2['url'].append(data[i]['id'])
+                        data2['title'].append(data[i]['title'])
+                        data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
+                        data2['author'].append(author)
             except:
                 pass
+
+            return data2
+        
+    @classmethod
+    async def from_title_solo(cls, url, author, *, loop=None, stream=False):
+        loop = loop or asyncio.get_event_loop()
+        data = await loop.run_in_executor(None, lambda: ydl2.extract_info(f"ytsearch1:{url}", download=stream))
+        if 'entries' in data:
+            # take first item from a playlist
+            data = data['entries']
+        if data == []:
+            return 1
+        else:
+            data2 = {}
+            data2['url'] = data[0]['url']
+            data2['title'] = data[0]['title']
+            data2['thumbnail'] = data[0]['thumbnails'][-1]['url']
+            data2['author'] = author
 
             return data2
     
     
     @classmethod
-    async def from_list(cls, url, *, loop=None, stream=False):
+    async def from_list(cls, url, author, *, loop=None, stream=False):
         loop = loop or asyncio.get_event_loop()
         data = await loop.run_in_executor(None, lambda: ydl2.extract_info(url, download=stream))
         if 'entries' in data:
@@ -92,13 +116,18 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if data == []:
             return 1
         else:
-            data2 = []
-            data2.append(data[0]['id'])
-            data2.append(data[0]['title'])
+            data2 = {'url': [], 'title': [], 'thumbnail': [], 'author': []}
+            data2['url'].append(data[0]['url'])
+            data2['title'].append(data[0]['title'])
+            data2['thumbnail'].append(data[0]['thumbnails'][-1]['url'])
+            data2['author'].append(author)
+            
             try:
-                for i in range(1, len(data[0])):
-                    data2.append(data[i]['id'])
-                    data2.append(data[i]['title'])
+                for i in range(1, len(data)):
+                    data2['url'].append(data[i]['url'])
+                    data2['title'].append(data[i]['title'])
+                    data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
+                    data2['author'].append(author)
             except:
                 pass
 

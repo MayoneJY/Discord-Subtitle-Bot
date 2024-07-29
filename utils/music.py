@@ -33,6 +33,7 @@ class Music():
         self.pasue_time = 0
 
     async def download(self, ctx, url):
+        download_msg = await ctx.send("다운로드 중...")
         check_player = False
         # for p in self.player:
         #     if p.data.get('webpage_url').split("v=")[1] == url.split("v=")[1].split("&")[0]:
@@ -51,23 +52,25 @@ class Music():
                     self.subtitles.append(sub)
             except Exception as e:
                 raise CustomError(f"자막 다운로드 중 오류가 발생했습니다. {e}")
-            try:
-                data.data['author'] = ctx.author.global_name
-            except:
-                data.data['author'] = ctx.user.global_name
-            self.player.append(data)
+            # try:
+            #     data.data['author'] = ctx.author.global_name
+            # except:
+            #     data.data['author'] = ctx.user.global_name
+            # self.player.append(data)
+            await download_msg.delete()
+            return data
 
     async def search(self, ctx, query):
         if ctx.response.is_done():
             await ctx.edit(content="검색중...")
         else:
             await ctx.respond("검색중...")
-        data = await YTDLSource.from_title(query)
+        data = await YTDLSource.from_title(query, author=ctx.user.global_name)
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
-        embed = Embed(title=data[1], url=f"https://www.youtube.com/watch?v={data[0]}")
-        embed.set_image(url=f"https://i.ytimg.com/vi/{data[0]}/hqdefault.jpg")
+        embed = Embed(title=data['title'][0], url=data['url'][0])
+        embed.set_image(url=data['thumbnail'][0])
         view = SearchView(ctx, data, self)
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)
@@ -75,43 +78,35 @@ class Music():
     async def list(self, ctx, url, current=False, msg=None):
         
         urltemp = f'https://music.youtube.com/playlist?list={url.split("list=")[1]}'
-        data = await YTDLSource.from_list(urltemp)
+        data = await YTDLSource.from_list(urltemp, author=ctx.user.global_name)
         if data == 1:
             await ctx.edit(content="``재생 목록을 불러오지 못했어요..!!``", delete_after=10)
             return
         if current:
-            for i in range(0, len(data), 2):
-                if url.split("v=")[1].split("&")[0] == data[i]:
-                    data = data[i:]
+            for i in range(len(data['url'])):
+                if url.split("v=")[1].split("&")[0] == data['url'][i].split("v=")[1]:
+                    data['url'] = data['url'][i:]
+                    data['title'] = data['title'][i:]
+                    data['thumbnail'] = data['thumbnail'][i:]
+                    data['author'] = data['author'][i:]
                     break
-        for i in range(0, len(data), 2):
-            data[i] = f"https://www.youtube.com/watch?v={data[i]}"
+        
+
         await self.list_queue(ctx, data, msg=msg)
 
     async def list_queue(self, ctx, url, msg=None):
         if msg:
             await msg.edit(content="로딩중...", view=None, embed=None)
         else:
-            test = await ctx.send(f"로딩중... (0/{int(len(url) / 2)})")
+            test = await ctx.send(f"로딩중...")
         
-        time = tt.time()
-
-        for i in range(0, len(url), 2):
-            await self.download(ctx, url[i])
-            if tt.time() - time > 1:
-                time = tt.time()
-                if msg:
-                    await msg.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
-                else:
-                    await test.edit(f"로딩중... ({int(i/2+1)}/{int(len(url) / 2)})")
-            if not self.playing:
-                asyncio.create_task(self.play(ctx))
-                
+        for i in range(len(url['url'])):
+            self.player.append({'url': url['url'][i], 'title': url['title'][i], 'thumbnail': url['thumbnail'][i], 'author': url['author'][i]})
 
         if msg:
-            await msg.edit(content=f"{int(len(url) / 2)}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await msg.edit(content=f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
         else:
-            await test.edit(f"{int(len(url) / 2)}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await test.edit(f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
 
         if not self.playing:
             await self.play(ctx)
@@ -122,7 +117,9 @@ class Music():
         else:
             test = await ctx.send("로딩중...")
 
-        await self.download(ctx, url)
+        # await self.download(ctx, url)
+        player = await YTDLSource.from_title_solo(url, author=ctx.user.global_name)
+        self.player.append({'url': url, 'title': player['title'], 'thumbnail': player['thumbnail'], 'author': player['author']})
 
         if msg:
             try:
@@ -149,18 +146,19 @@ class Music():
             try:
                 self.subtitles_index = 0
                 self.now_time = 0
+                player = await self.download(ctx, self.player[self.current]['url'])
                 try:
-                    current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == self.player[self.current].title), None)
+                    current_subtitles = next((subtitle for subtitle in self.subtitles if subtitle['title'] == player.title), None)
                 except:
                     current_subtitles = None
                 # 재생 중인 음악 정보 출력
-                embedtitle = discord.Embed(title=self.player[self.current].title, url=self.player[self.current].data.get('webpage_url'))
+                embedtitle = discord.Embed(title=player.title, url=self.player[self.current]['url'])
                 embedtitle.set_author(name="현재 재생중~")
-                embedtitle.set_image(url=self.player[self.current].data.get('thumbnail'))
-                embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
+                embedtitle.set_image(url=self.player[self.current]['thumbnail'])
+                embedtitle.add_field(name="요청자", value="``" + self.player[self.current]['author'] + "``", inline=True)
                 # 다음곡
                 if self.current + 1 < len(self.player):
-                    embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
+                    embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1]['title'] + "``", inline=True)
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
                 view = playControlPanel(ctx, self)
@@ -179,7 +177,7 @@ class Music():
                     if lang in language_reactions:
                         await sendmessage.add_reaction(language_reactions[lang])
 
-                ctx.voice_client.play(self.player[self.current])
+                ctx.voice_client.play(player)
 
 
                 subtitle_change = True
@@ -217,10 +215,10 @@ class Music():
                                 subtitle_change = True
                     
                     embedtitle.clear_fields()
-                    embedtitle.add_field(name="요청자", value="``" + self.player[self.current].data.get('author') + "``", inline=True)
+                    embedtitle.add_field(name="요청자", value="``" + self.player[self.current]['author'] + "``", inline=True)
                     # 다음곡
                     if self.current + 1 < len(self.player):
-                        embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1].title + "``", inline=True)
+                        embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1]['title'] + "``", inline=True)
                     else:
                         embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
                     # 자막 출력
