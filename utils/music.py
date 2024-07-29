@@ -172,13 +172,6 @@ class Music():
                     'zh-CN': "🇨🇳",
                     'zh-TW': "🇹🇼"
                 }
-                for sub in current_subtitles.get('subtitles', []):
-                    lang = sub.get('lang')
-                    if lang in language_reactions:
-                        await sendmessage.add_reaction(language_reactions[lang])
-
-                ctx.voice_client.play(player)
-
 
                 subtitle_change = True
                 message = ""
@@ -186,7 +179,14 @@ class Music():
                 # print(f".{current_subtitles}.")
                 subtitle = None
                 if current_subtitles:
+                    for sub in current_subtitles.get('subtitles', []):
+                        lang = sub.get('lang')
+                        if lang in language_reactions:
+                            await sendmessage.add_reaction(language_reactions[lang])
                     subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
+
+                ctx.voice_client.play(player)
+
                 # await asyncio.sleep(5)
                 first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
                 self.now_time = first_time - 1
