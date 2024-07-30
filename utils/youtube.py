@@ -131,5 +131,4 @@ class YTDLSource(discord.PCMVolumeTransformer):
             except:
                 pass
             
-            print(data2)
             return data2

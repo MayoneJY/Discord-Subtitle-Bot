@@ -107,9 +107,9 @@ class Music():
             self.player.append({'url': url['url'][i], 'title': url['title'][i], 'thumbnail': url['thumbnail'][i], 'author': url['author'][i]})
 
         if msg:
-            await msg.edit(content=f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await self.queue_embed(msg, url)
         else:
-            await ctx.edit(f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await self.queue_embed(ctx, url)
 
         if not self.playing:
             await self.play(ctx)
@@ -128,15 +128,28 @@ class Music():
         self.player.append({'url': url, 'title': player['title'], 'thumbnail': player['thumbnail'], 'author': player['author']})
 
         if msg:
-            await msg.edit(content="재생목록에 추가되었습니다.")
-            await msg.delete(delay=5)
+            await self.queue_embed(msg, player)
         else:
-            await ctx.edit(content="재생목록에 추가되었습니다.")
-            await ctx.delete(delay=5)
+            await self.queue_embed(ctx, player)
 
         if not self.playing:
             await self.play(ctx)
 
+    async def queue_embed(self, ctx, data):
+        title = data['title'] if type(data['title']) == str else data['title'][0]
+        url = data['url'] if type(data['url']) == str else data['url'][0]
+        thumbnail = data['thumbnail'] if type(data['thumbnail']) == str else data['thumbnail'][0]
+        author = data['author'] if type(data['author']) == str else data['author'][0]
+        length = len(data['title']) if type(data['title']) == list else 1
+        embed = Embed(title=title, url=url)
+        embed.set_author(name='예약')
+        embed.add_field(name="예약 성공!", value=f'{len(self.player)-self.current-length}번째에 재생됩니다.')
+        embed.add_field(name="요청자", value=author, inline=True)
+        embed.add_field(name="추가된 재생목록 수", value=f"{length}개", inline=True)
+        embed.set_image(url=thumbnail)
+
+        await ctx.edit(embed=embed)
+        await ctx.delete(delay=5)
 
     async def play(self, ctx):
         if self.playing:
@@ -256,7 +269,8 @@ class Music():
                 await sendmessage.delete()
             except:
                 pass
-
+        
+        await ctx.send("재생목록이 끝났습니다 :)")
         self.playing = False
         self.reset()
 
