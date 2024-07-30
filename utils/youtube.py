@@ -65,20 +65,20 @@ class YTDLSource(discord.PCMVolumeTransformer):
             return 1
         else:
             data2 = {'url': [], 'title': [], 'thumbnail': [], 'author': []}
-            data2['url'].append(data[0]['id'])
+            data2['url'].append(data[0]['url'])
             data2['title'].append(data[0]['title'])
             data2['thumbnail'].append(data[0]['thumbnails'][-1]['url'])
             data2['author'].append(author)
             try:
                 if len(data[0]) >= 5:
                     for i in range(1, 5):
-                        data2['url'].append(data[i]['id'])
+                        data2['url'].append(data[i]['url'])
                         data2['title'].append(data[i]['title'])
                         data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
                         data2['author'].append(author)
                 else:
                     for i in range(1, len(data[0])):
-                        data2['url'].append(data[i]['id'])
+                        data2['url'].append(data[i]['url'])
                         data2['title'].append(data[i]['title'])
                         data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
                         data2['author'].append(author)
@@ -130,5 +130,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
                     data2['author'].append(author)
             except:
                 pass
-
+            
+            print(data2)
             return data2

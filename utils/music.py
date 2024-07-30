@@ -98,7 +98,10 @@ class Music():
         if msg:
             await msg.edit(content="로딩중...", view=None, embed=None)
         else:
-            test = await ctx.send(f"로딩중...")
+            if ctx.response.is_done():
+                await ctx.edit(content="로딩중...")
+            else:
+                await ctx.respond("로딩중...")
         
         for i in range(len(url['url'])):
             self.player.append({'url': url['url'][i], 'title': url['title'][i], 'thumbnail': url['thumbnail'][i], 'author': url['author'][i]})
@@ -106,7 +109,7 @@ class Music():
         if msg:
             await msg.edit(content=f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
         else:
-            await test.edit(f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
+            await ctx.edit(f"{len(url['url'])}개의 곡이 재생목록에 추가되었습니다.", delete_after=5)
 
         if not self.playing:
             await self.play(ctx)
@@ -115,21 +118,21 @@ class Music():
         if msg:
             await msg.edit(content="로딩중...", view=None, embed=None)
         else:
-            test = await ctx.send("로딩중...")
+            if ctx.response.is_done():
+                await ctx.edit(content="로딩중...")
+            else:
+                await ctx.respond("로딩중...")
 
         # await self.download(ctx, url)
         player = await YTDLSource.from_title_solo(url, author=ctx.user.global_name)
         self.player.append({'url': url, 'title': player['title'], 'thumbnail': player['thumbnail'], 'author': player['author']})
 
         if msg:
-            try:
-                await msg.edit(content="재생목록에 추가되었습니다.", delete_after=5)
-            except:
-                await msg.edit(content="재생목록에 추가되었습니다.")
-                tt.sleep(5)
-                await msg.delete()
+            await msg.edit(content="재생목록에 추가되었습니다.")
+            await msg.delete(delay=5)
         else:
-            await test.edit("재생목록에 추가되었습니다.", delete_after=5)
+            await ctx.edit(content="재생목록에 추가되었습니다.")
+            await ctx.delete(delay=5)
 
         if not self.playing:
             await self.play(ctx)
@@ -177,6 +180,8 @@ class Music():
                 message = ""
                 subtitle_current_lang = self.subtitles_language
                 # print(f".{current_subtitles}.")
+                # TODO: WARNING: [youtube:tab] YouTube Music is not directly supported. Redirecting to https://www.youtube.com/playlist?list=PLGGsmHNEfAuPa-Erf5spGKAfTUwKBy2Af 
+                # WARNING: [youtube:tab] YouTube said: INFO - 1 unavailable video is hidden 
                 subtitle = None
                 if current_subtitles:
                     for sub in current_subtitles.get('subtitles', []):
@@ -253,6 +258,7 @@ class Music():
                 pass
 
         self.playing = False
+        self.reset()
 
     async def command_play(self, ctx, url):
         # URL이 아닐 경우
@@ -268,8 +274,14 @@ class Music():
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
             view = ListView(ctx, self, url)
-            msg = await ctx.send("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
-            view.init(msg)
+            print(0)
+            if ctx.response.is_done():
+                print(1)
+                await ctx.send_followup(content="재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)    
+            else:
+                print(2)
+                await ctx.respond("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
+
         else:
             await self.queue(ctx, url)
 

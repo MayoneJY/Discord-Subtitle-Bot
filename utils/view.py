@@ -8,6 +8,7 @@ class ListView(View):
         self.ctx = ctx
         self.music = music
         self.url = url
+        self.original_message = None
         
         self.button1 = Button(style=ButtonStyle.primary, label="처음 곡부터 추가", custom_id="1")
         self.button2 = Button(style=ButtonStyle.primary, label="현재 곡부터 추가", custom_id="2")
@@ -21,21 +22,25 @@ class ListView(View):
         self.add_item(self.button2)
         self.add_item(self.button3)
 
-    def init(self, msg):
-        self.original_message = msg
+    async def init(self, interaction):
+        if self.original_message is None:
+            self.original_message = await interaction.channel.fetch_message(interaction.message.id)
 
     async def first(self, interaction):
         await interaction.response.defer()
+        await self.init(interaction)
         await self.original_message.edit("처음 곡부터 추가합니다.", view=None)
         await self.music.list(self.ctx, self.url, msg=self.original_message)
 
     async def current(self, interaction):
         await interaction.response.defer()
+        await self.init(interaction)
         await self.original_message.edit("현재 곡부터 추가합니다.", view=None)
         await self.music.list(self.ctx, self.url, current=True, msg=self.original_message)
 
     async def one(self, interaction):
         await interaction.response.defer()
+        await self.init(interaction)
         await self.original_message.edit("한 곡만 추가합니다.")
         await self.music.queue(self.ctx, self.url.split("&list=")[0], msg=self.original_message)
 
