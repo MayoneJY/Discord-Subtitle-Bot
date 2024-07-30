@@ -122,7 +122,12 @@ class playControlPanel(View):
         self.pauseButton = self.pauseButtonView
         self.skipButton = Button(style=ButtonStyle.gray, label="다음곡", custom_id="skip", emoji="⏭️")
         self.stopButton = Button(style=ButtonStyle.danger, label="정지", custom_id="stop", emoji="⏹️")
-        self.repeatButton = Button(style=ButtonStyle.gray, label="반복 안함", custom_id="repeat", emoji="➡️")
+        if self.music.music_loop == "안함":
+            self.repeatButton = Button(style=ButtonStyle.gray, label="반복 안함", custom_id="repeat", emoji="➡️")
+        elif self.music.music_loop == "반복":
+            self.repeatButton = Button(style=ButtonStyle.green, label="반복", custom_id="repeat", emoji="🔁")
+        else:
+            self.repeatButton = Button(style=ButtonStyle.green, label="한 곡 반복", custom_id="repeat", emoji="🔂")
 
         self.init()
 
@@ -175,4 +180,20 @@ class playControlPanel(View):
 
     async def repeat(self, interaction):
         await interaction.response.defer()
+        if self.repeatButton.label == "반복 안함":
+            self.repeatButton.label = "반복"
+            self.repeatButton.style = ButtonStyle.green
+            self.repeatButton.emoji = "🔁"
+            self.music.music_loop = "반복"
+        elif self.repeatButton.label == "반복":
+            self.repeatButton.label = "한 곡 반복"
+            self.repeatButton.style = ButtonStyle.green
+            self.repeatButton.emoji = "🔂"
+            self.music.music_loop = "한곡"
+        else:
+            self.repeatButton.label = "반복 안함"
+            self.repeatButton.style = ButtonStyle.gray
+            self.repeatButton.emoji = "➡️"
+            self.music.music_loop = "안함"
+        await self.msg.edit(view=self)
         # await self.music.repeat(self.ctx)

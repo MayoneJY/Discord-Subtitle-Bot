@@ -10,7 +10,7 @@ from utils.subtitle import Subtitle
 class Music():
     def __init__(self, loop):
         self.loop = loop
-        self.music_loop = False # 반복재생 여부
+        self.music_loop = "안함" # 반복재생 여부
         self.playing = False # 재생중 여부
         self.subtitles = [] # 자막 - [{title: 제목, subtitles: [{언어: 언어코드, 자막: [{text: 자막, time: 시간}]}, ...]}]
         self.subtitles_index = 0 # 자막 인덱스
@@ -282,12 +282,17 @@ class Music():
                 except:
                     pass
                 await ctx.send("오류가 발생하여 이번 곡을 정지합니다.")
-            self.current += 1
+            
+            if self.current + 1 == len(self.player):
+                self.current = 0
+
+            elif self.music_loop != "한곡":
+                self.current += 1
+            
             try:
                 await sendmessage.delete()
             except:
                 pass
-        
         await ctx.send("재생목록이 끝났습니다 :)", delete_after=5)
         self.playing = False
         self.reset()
