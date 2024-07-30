@@ -177,6 +177,13 @@ class Music():
                     embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1]['title'] + "``", inline=True)
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
+                
+                duration_hour = player.duration // 3600
+                duration_min = (player.duration % 3600) // 60
+                duration_sec = player.duration % 60
+                # duration_hour가 0이면 출력하지 않음
+                duration_time = f"{duration_hour}:" + f"{duration_min:02d}:" + f"{duration_sec:02d}" if duration_hour != 0 else f"{duration_min:02d}:" + f"{duration_sec:02d}"
+                embedtitle.set_footer(text="0:00 / " + duration_time)
                 view = playControlPanel(ctx, self)
                 sendmessage = await ctx.send(embed=embedtitle, view=view)
                 view.initMsg(sendmessage)
@@ -208,7 +215,6 @@ class Music():
                 # await asyncio.sleep(5)
                 first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
                 self.now_time = first_time - 1
-
                 while True: # 음악이 재생중일 때
                     if not ctx.voice_client:
                         break
@@ -239,19 +245,31 @@ class Music():
                         embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1]['title'] + "``", inline=True)
                     else:
                         embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
+                    # duration_hour가 0이면 출력하지 않음
+                    duration_time = f"{duration_hour}:" + f"{duration_min:02d}:" + f"{duration_sec:02d}" if duration_hour != 0 else f"{duration_min:02d}:" + f"{duration_sec:02d}"
+                    # time이 1시간 이상이면 시간도 출력
+                    time_hour = int(time) // 3600
+                    time_min = (int(time) % 3600) // 60
+                    time_sec = int(time) % 60
+                    time_str = f"{time_hour}:" + f"{time_min:02d}:" + f"{time_sec:02d}" if time_hour != 0 else f"{time_min:02d}:" + f"{time_sec:02d}"
+                    embedtitle.set_footer(text=time_str + " / " + duration_time)
                     # 자막 출력
                     if subtitle:
+                            
+                        message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
+
+                        if len(subtitle['subtitles']) > self.subtitles_index + 1:
+                            message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
+                        else:
+                            message += "```brainfuck\n End \n ```"
+                        embedtitle.add_field(name="자막", value=message[:900], inline=False)
                         if current_subtitles and subtitle_change:
                             subtitle_change = False
-                            
-                            message = f"```yaml\n{subtitle['subtitles'][self.subtitles_index]['text']}\n```"
-
-                            if len(subtitle['subtitles']) > self.subtitles_index + 1:
-                                message += f"```brainfuck\n{subtitle['subtitles'][self.subtitles_index + 1]['text']}\n```"
-                            else:
-                                message += "```brainfuck\n End \n ```"
-                            embedtitle.add_field(name="자막", value=message[:900], inline=False)
                             await sendmessage.edit(embed=embedtitle)
+                        else:
+                            if time + 1 < subtitle['subtitles'][self.subtitles_index]['time']:
+                                await asyncio.sleep(0.5)
+                                await sendmessage.edit(embed=embedtitle)
                     else:
                         await asyncio.sleep(0.5)
                         await sendmessage.edit(embed=embedtitle)
@@ -270,7 +288,7 @@ class Music():
             except:
                 pass
         
-        await ctx.send("재생목록이 끝났습니다 :)")
+        await ctx.send("재생목록이 끝났습니다 :)", delete_after=5)
         self.playing = False
         self.reset()
 
@@ -288,12 +306,9 @@ class Music():
             raise CustomError("유튜브 URL이 아닙니다.")
         elif "list=" in url:
             view = ListView(ctx, self, url)
-            print(0)
             if ctx.response.is_done():
-                print(1)
                 await ctx.send_followup(content="재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)    
             else:
-                print(2)
                 await ctx.respond("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
 
         else:
@@ -309,13 +324,14 @@ class Music():
 
     async def command_stop(self, ctx):
         if ctx.voice_client is None:
-            await ctx.respond("음성 채널에 봇이 없습니다.")
+            raise CustomError("음성 채널에 봇이 없습니다.")
             return
         if ctx.voice_client.is_playing():
             ctx.voice_client.stop()
             self.reset()
         await ctx.voice_client.disconnect()
         await ctx.respond("음성 채널에서 퇴장했습니다.")
+        await ctx.delete(delay=5)
 
     async def command_pause(self, ctx):
         self.pasue_time = tt.time()
