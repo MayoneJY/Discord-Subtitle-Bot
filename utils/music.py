@@ -325,7 +325,10 @@ class Music():
         if not ctx.voice_client.is_playing():
             raise CustomError("음악이 재생되고 있지 않습니다.")
         ctx.voice_client.stop()
-        await ctx.respond("음악을 건너뛸게요.", delete_after=5)
+        try:
+            await ctx.respond("음악을 건너뛸게요.", delete_after=5)
+        except:
+            await ctx.send("음악을 건너뛸게요.", delete_after=5)
 
     async def command_stop(self, ctx):
         if ctx.voice_client is None:
@@ -335,7 +338,10 @@ class Music():
             ctx.voice_client.stop()
             self.reset()
         await ctx.voice_client.disconnect()
-        await ctx.respond("음성 채널에서 퇴장했습니다.")
+        try:
+            await ctx.respond("음성 채널에서 퇴장했습니다.")
+        except:
+            await ctx.send("음성 채널에서 퇴장했습니다.")
         await ctx.delete(delay=5)
 
     async def command_pause(self, ctx):
