@@ -60,11 +60,11 @@ class Core(commands.Cog, name="뮤직봇"):
             # 봇이 다른 음성채널에 들어가 있고, 유저와 같은 채널이 아닐 경우
             if ctx.voice_client and ctx.voice_client.channel and ctx.voice_client.channel != ctx.author.voice.channel:
                 await ctx.voice_client.move_to(ctx.author.voice.channel)
-                await ctx.respond("음성채널을 옮겼습니다.", delete_after=5)
+                await ctx.send("음성채널을 옮겼습니다.", delete_after=5)
             elif not ctx.voice_client:  # 봇이 음성채널에 없을 경우
                 channel = ctx.author.voice.channel  # 채널 구하기
                 await channel.connect()  # 채널 연결
-                await ctx.respond("봇이 음성채널에 입장했습니다.", delete_after=5)
+                await ctx.send("봇이 음성채널에 입장했습니다.", delete_after=5)
         else:  # 유저가 채널에 없으면
             raise CustomError("음성채널에 연결되지 않았습니다.")  # 출력
     # @commands.Cog.listener()

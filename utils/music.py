@@ -71,6 +71,7 @@ class Music():
             return
         embed = Embed(title=data['title'][0], url=data['url'][0])
         embed.set_image(url=data['thumbnail'][0])
+        embed.set_footer(text=data['duration'][0])
         view = SearchView(ctx, data, self)
         await ctx.edit(content="", view=view, embed=embed)
         # await view.init(await ctx.interaction.original_message().id)

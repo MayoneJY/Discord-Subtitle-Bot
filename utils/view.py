@@ -75,6 +75,7 @@ class SearchView(View):
     async def embed(self):
         embed = Embed(title=self.data['title'][self.page], url=self.data['url'][self.page])
         embed.set_image(url=self.data['thumbnail'][self.page])
+        embed.set_footer(text=self.data['duration'][self.page])
         await self.original_message.edit(embed=embed)
 
 

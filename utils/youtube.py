@@ -64,11 +64,23 @@ class YTDLSource(discord.PCMVolumeTransformer):
         if data == []:
             return 1
         else:
-            data2 = {'url': [], 'title': [], 'thumbnail': [], 'author': []}
+            data2 = {'url': [], 'title': [], 'thumbnail': [], 'author': [], 'duration': []}
             data2['url'].append(data[0]['url'])
             data2['title'].append(data[0]['title'])
             data2['thumbnail'].append(data[0]['thumbnails'][-1]['url'])
             data2['author'].append(author)
+
+            def calc_duration(duration):
+                duration_hour = int(duration // 3600)
+                duration_min = int((duration % 3600) // 60)
+                duration_sec = int(duration % 60)
+                if duration_hour == 0:
+                    return f"{duration_min:02}:{duration_sec:02}"
+                else:
+                    return f"{duration_hour}:{duration_min:02}:{duration_sec:02}"
+                
+            data2['duration'].append(calc_duration(data[0]['duration']))
+
             try:
                 if len(data[0]) >= 5:
                     for i in range(1, 5):
@@ -76,12 +88,14 @@ class YTDLSource(discord.PCMVolumeTransformer):
                         data2['title'].append(data[i]['title'])
                         data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
                         data2['author'].append(author)
+                        data2['duration'].append(calc_duration(data[i]['duration']))
                 else:
                     for i in range(1, len(data[0])):
                         data2['url'].append(data[i]['url'])
                         data2['title'].append(data[i]['title'])
                         data2['thumbnail'].append(data[i]['thumbnails'][-1]['url'])
                         data2['author'].append(author)
+                        data2['duration'].append(calc_duration(data[i]['duration']))
             except:
                 pass
 
