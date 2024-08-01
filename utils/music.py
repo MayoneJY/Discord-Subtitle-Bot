@@ -22,7 +22,7 @@ class Music():
         self.pasue_time = 0
 
     def reset(self):
-        self.music_loop = False
+        self.music_loop = "안함"
         self.playing = False
         self.subtitles = []
         self.subtitles_index = 0
@@ -284,12 +284,11 @@ class Music():
                     pass
                 await ctx.send("오류가 발생하여 이번 곡을 정지합니다.")
             
-            if self.current + 1 == len(self.player):
+            if self.music_loop == '반복' and self.current + 1 == len(self.player):
                 self.current = 0
 
             elif self.music_loop != "한곡":
                 self.current += 1
-            
             try:
                 await sendmessage.delete()
             except:
@@ -340,9 +339,9 @@ class Music():
             self.reset()
         await ctx.voice_client.disconnect()
         try:
-            await ctx.respond("음성 채널에서 퇴장했습니다.")
+            await ctx.respond("음성 채널에서 퇴장했습니다.", delete_after=5)
         except:
-            await ctx.send("음성 채널에서 퇴장했습니다.")
+            await ctx.send("음성 채널에서 퇴장했습니다.", delete_after=5)
         await ctx.delete(delay=5)
 
     async def command_pause(self, ctx):

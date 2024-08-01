@@ -89,19 +89,26 @@ async def on_application_command_error(ctx, error):
             await ctx.send(embed=embed)
         else:
             embed = discord.Embed(title="오류!!", description="오류가 발생했습니다.", color=0xFF0000)
-            embed.add_field(name="상세", value=f"```{error}```", inline=False)
+            embed.add_field(name="상세", value=f"```{format_exception(type(error), error, error.__traceback__)}```", inline=False)
+            embed.add_field(name="명령어", value=str(ctx.command.qualified_name) + " " + str(ctx.selected_options), inline=False)
 
-            await ctx.send(embed=embed)
+            user = await app.fetch_user(authorId)
+            errortxt = str(format_exception(type(error), error, error.__traceback__)).replace("\\n", "\n")
+            errortxt_chunks = [errortxt[i:i+1000] for i in range(0, len(errortxt), 1000)]
+            for chunk in errortxt_chunks:
+                await user.send(f"```{chunk}```")
+            print(errortxt)
     else:
 
         embed = discord.Embed(title="오류!!", description="오류가 발생했습니다.", color=0xFF0000)
-        #embed.add_field(name="상세", value=f"```{format_exception(type(error), error, error.__traceback__)}```", inline=False)
+        embed.add_field(name="상세", value=f"```{format_exception(type(error), error, error.__traceback__)}```", inline=False)
         embed.add_field(name="명령어", value=str(ctx.command.qualified_name) + " " + str(ctx.selected_options), inline=False)
 
         user = await app.fetch_user(authorId)
-        await user.send(embed=embed)
         errortxt = str(format_exception(type(error), error, error.__traceback__)).replace("\\n", "\n")
-        # await user.send(f"`{errortxt}`")
+        errortxt_chunks = [errortxt[i:i+1000] for i in range(0, len(errortxt), 1000)]
+        for chunk in errortxt_chunks:
+            await user.send(f"```{chunk}```")
         print(errortxt)
 
 

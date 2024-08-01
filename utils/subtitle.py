@@ -70,12 +70,15 @@ class Subtitle:
                 i = 1
                 while i < len(tempSubtiles): 
 
-                    if tempSubtiles[i] == tempSubtiles[i - 1]:
+                    if tempSubtiles[i].replace(' ','') == tempSubtiles[i - 1].replace(' ',''):
                         del tempSubtiles[i]
                         del tempTimes[i]
                         i -= 1
+                    i += 1
+                i = 1
+                while i < len(tempSubtiles): 
 
-                    elif tempTimes[i] - tempTimes[i - 1] < 1:
+                    if tempTimes[i] - tempTimes[i - 1] < 1:
                         tempSubtiles[i - 1] += "\n" + tempSubtiles[i]
                         del tempSubtiles[i]
                         del tempTimes[i]
