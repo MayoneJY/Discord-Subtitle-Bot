@@ -6,9 +6,11 @@ from utils.error import CustomError
 from utils.view import SearchView, playControlPanel, ListView
 from utils.youtube import YTDLSource
 from utils.subtitle import Subtitle
+from datetime import datetime
 
 class Music():
-    def __init__(self, loop):
+    def __init__(self, app, loop):
+        self.app = app
         self.loop = loop
         self.music_loop = "안함" # 반복재생 여부
         self.playing = False # 재생중 여부
@@ -179,11 +181,17 @@ class Music():
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
                 
+
                 duration_hour = player.duration // 3600
                 duration_min = (player.duration % 3600) // 60
                 duration_sec = player.duration % 60
                 # duration_hour가 0이면 출력하지 않음
-                duration_time = f"{duration_hour}:" + f"{duration_min:02d}:" + f"{duration_sec:02d}" if duration_hour != 0 else f"{duration_min:02d}:" + f"{duration_sec:02d}"
+                duration_time = f"{duration_hour}:{duration_min:02d}:{duration_sec:02d}" if duration_hour != 0 else f"{duration_min:02d}:{duration_sec:02d}"
+
+                channel = self.app.get_channel(888048290141179938)
+                print_log = f"``{str(datetime.now())}Channel:{str(ctx.guild.name)} | Playing: {str(player.title)} | duration: {duration_time}``"
+                await channel.send(print_log)
+                print(print_log)
                 embedtitle.set_footer(text="0:00 / " + duration_time)
                 view = playControlPanel(ctx, self)
                 sendmessage = await ctx.send(embed=embedtitle, view=view)
@@ -238,7 +246,7 @@ class Music():
                             if time >= subtitle['subtitles'][i]['time']:
                                 self.subtitles_index += 1
                                 subtitle_change = True
-                    
+
                     embedtitle.clear_fields()
                     embedtitle.add_field(name="요청자", value="``" + self.player[self.current]['author'] + "``", inline=True)
                     # 다음곡

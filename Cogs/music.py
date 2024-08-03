@@ -42,7 +42,7 @@ class Core(commands.Cog, name="뮤직봇"):
             await ctx.defer()
         # await ctx.respond("로딩중...", delete_after=2)
         if not guilds.get(ctx.guild.id):
-            guilds[ctx.guild.id] = Music(self.loop)
+            guilds[ctx.guild.id] = Music(self.app, self.loop)
 
         await guilds[ctx.guild.id].command_play(ctx, url)
 
