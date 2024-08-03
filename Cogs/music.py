@@ -52,6 +52,12 @@ class Core(commands.Cog, name="뮤직봇"):
         if not guilds.get(ctx.guild.id):
             raise CustomError("음악이 재생되고 있지 않습니다.")
         await guilds[ctx.guild.id].command_skip(ctx)
+
+    @slash_command(name="볼륨", description="볼륨을 조절합니다.", guild_ids=guild_ids)
+    async def volume(self, ctx, volume: int):
+        if not guilds.get(ctx.guild.id):
+            raise CustomError("음악이 재생되고 있지 않습니다.")
+        await guilds[ctx.guild.id].command_volume(ctx, volume)
         
     
     @play.before_invoke

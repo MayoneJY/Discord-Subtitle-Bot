@@ -220,6 +220,7 @@ class Music():
                     subtitle = next((sub for sub in current_subtitles['subtitles'] if sub['lang'] == self.subtitles_language), current_subtitles['subtitles'][0] )
 
                 ctx.voice_client.play(player)
+                ctx.voice_client.source.volume = self.volume
 
                 # await asyncio.sleep(5)
                 first_time = tt.time() # 코드 걸린 시간을 포함해서 1초를 쉬기 위한 변수
@@ -380,3 +381,14 @@ class Music():
         self.current -= 2
         ctx.voice_client.stop()
         # await ctx.respond("이전 곡을 재생합니다.", delete_after=5)
+
+    async def command_volume(self, ctx, volume):
+        if ctx.voice_client is None:
+            raise CustomError("음성 채널에 봇이 없습니다.")
+        if not ctx.voice_client.is_playing():
+            raise CustomError("음악이 재생되고 있지 않습니다.")
+        if volume < 0 or volume > 100:
+            raise CustomError("볼륨은 0 ~ 100 사이로 설정해주세요.")
+        self.volume = volume / 100
+        ctx.voice_client.source.volume = self.volume
+        await ctx.send(f"볼륨을 {volume}%로 조절했습니다.", delete_after=5)

@@ -34,6 +34,17 @@ async def on_ready():
     print("==========")
     game = discord.Game("오류 수집")
     await app.change_presence(status=discord.Status.dnd, activity=game)
+    change_status.start()
+
+@tasks.loop(seconds=10)
+async def change_status():
+    usersCount = 0
+    for guild in app.guilds:
+        usersCount += guild.member_count
+
+    playing = [playing_default, f"{len(app.guilds)}개의 서버와 함께", f"{usersCount}명의 유저와 함께", ]
+    
+    await app.change_presence(status=discord.Status.online, activity=discord.Game(playing[next(playingcount)]))
 
 @app.command(name="리로드")
 async def reload_commands(ctx, extension=None):
