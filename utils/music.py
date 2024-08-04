@@ -391,4 +391,7 @@ class Music():
             raise CustomError("볼륨은 0 ~ 100 사이로 설정해주세요.")
         self.volume = volume / 100
         ctx.voice_client.source.volume = self.volume
-        await ctx.send(f"볼륨을 {volume}%로 조절했습니다.", delete_after=5)
+        if ctx.response.is_done():
+            await ctx.send(f"볼륨을 {volume}%로 조절했습니다.", delete_after=5)
+        else:
+            await ctx.respond(f"볼륨을 {volume}%로 조절했습니다.", delete_after=5)
