@@ -128,7 +128,12 @@ class Music():
 
         # await self.download(ctx, url)
         player = await YTDLSource.from_title_solo(url, author=ctx.user.global_name)
+        if player == 1:
+            await ctx.delete()
+            raise CustomError("음악을 추가하는데 오류가 발생했습니다.")
+        
         self.player.append({'url': url, 'title': player['title'], 'thumbnail': player['thumbnail'], 'author': player['author']})
+
 
         if msg:
             await self.queue_embed(msg, player)
@@ -177,7 +182,7 @@ class Music():
                 embedtitle.add_field(name="요청자", value="``" + self.player[self.current]['author'] + "``", inline=True)
                 # 다음곡
                 if self.current + 1 < len(self.player):
-                    embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1]['title'] + "``", inline=True)
+                    embedtitle.add_field(name="다음곡", value=f"[{self.player[self.current + 1]['title']}]({self.player[self.current + 1]['url']})", inline=True)
                 else:
                     embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
                 
@@ -252,7 +257,7 @@ class Music():
                     embedtitle.add_field(name="요청자", value="``" + self.player[self.current]['author'] + "``", inline=True)
                     # 다음곡
                     if self.current + 1 < len(self.player):
-                        embedtitle.add_field(name="다음곡", value="``" + self.player[self.current + 1]['title'] + "``", inline=True)
+                        embedtitle.add_field(name="다음곡", value=f"[{self.player[self.current + 1]['title']}]({self.player[self.current + 1]['url']})", inline=True)
                     else:
                         embedtitle.add_field(name="다음곡", value="``없음``", inline=True)
                     # duration_hour가 0이면 출력하지 않음
@@ -383,6 +388,7 @@ class Music():
         # await ctx.respond("이전 곡을 재생합니다.", delete_after=5)
 
     async def command_volume(self, ctx, volume):
+        volume = int(volume)
         if ctx.voice_client is None:
             raise CustomError("음성 채널에 봇이 없습니다.")
         if not ctx.voice_client.is_playing():
@@ -395,3 +401,37 @@ class Music():
             await ctx.send(f"볼륨을 {volume}%로 조절했습니다.", delete_after=5)
         else:
             await ctx.respond(f"볼륨을 {volume}%로 조절했습니다.", delete_after=5)
+
+    async def command_queue_list(self, ctx):
+        if len(self.player) == 0:
+            raise CustomError("재생목록이 비어있습니다.")
+        
+        embeds = []
+        embeds.append(Embed(title="재생목록", description=""))
+        msg = ""
+        for i in range(len(self.player)):
+            temp = f"{i+1}. {self.player[i]['title']}"
+            if i == self.current:
+                temp += "`현재 재생중`\n"
+            else:
+                temp += "\n"
+            if len(msg + temp) > 900:
+                embeds[-1].description = msg
+                msg = ""
+                embeds.append(Embed(title="재생목록", description=""))
+                msg += temp
+            else:
+                msg += temp
+        embeds[-1].description = msg
+        # 닫기 버튼 추가
+        async def close_callback(interaction):
+            await interaction.message.delete()
+        
+        view = discord.ui.View()
+        close_button = discord.ui.Button(style=discord.ButtonStyle.danger, label="닫기", custom_id="close", row=0)
+        close_button.callback = close_callback
+        view.add_item(close_button)
+        
+
+        await ctx.respond(embeds=embeds, view=view)
+
