@@ -76,6 +76,8 @@ class Core(commands.Cog, name="뮤직봇"):
                 await ctx.voice_client.move_to(ctx.author.voice.channel)
                 await ctx.send("음성채널을 옮겼습니다.", delete_after=5)
             elif not ctx.voice_client:  # 봇이 음성채널에 없을 경우
+                if guilds.get(ctx.guild.id):
+                    guilds[ctx.guild.id].reset()
                 channel = ctx.author.voice.channel  # 채널 구하기
                 await channel.connect()  # 채널 연결
                 await ctx.send("봇이 음성채널에 입장했습니다.", delete_after=5)

@@ -71,13 +71,16 @@ class YTDLSource(discord.PCMVolumeTransformer):
             data2['author'].append(author)
 
             def calc_duration(duration):
-                duration_hour = int(duration // 3600)
-                duration_min = int((duration % 3600) // 60)
-                duration_sec = int(duration % 60)
-                if duration_hour == 0:
-                    return f"{duration_min:02}:{duration_sec:02}"
-                else:
-                    return f"{duration_hour}:{duration_min:02}:{duration_sec:02}"
+                try:
+                    duration_hour = int(duration // 3600)
+                    duration_min = int((duration % 3600) // 60)
+                    duration_sec = int(duration % 60)
+                    if duration_hour == 0:
+                        return f"{duration_min:02}:{duration_sec:02}"
+                    else:
+                        return f"{duration_hour}:{duration_min:02}:{duration_sec:02}"
+                except:
+                    return "알수없음"
                 
             data2['duration'].append(calc_duration(data[0]['duration']))
 

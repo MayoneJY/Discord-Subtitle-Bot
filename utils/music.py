@@ -147,7 +147,13 @@ class Music():
         title = data['title'] if type(data['title']) == str else data['title'][0]
         url = data['url'] if type(data['url']) == str else data['url'][0]
         thumbnail = data['thumbnail'] if type(data['thumbnail']) == str else data['thumbnail'][0]
-        author = data['author'] if type(data['author']) == str else data['author'][0]
+        if type(data['author']) == str:
+            author = data['author']
+        else:
+            if data['author'][0] == None:
+                author = "알 수 없음"
+            else:
+                author = data['author'][0]
         length = len(data['title']) if type(data['title']) == list else 1
         embed = Embed(title=title, url=url)
         embed.set_author(name='예약')
@@ -331,6 +337,8 @@ class Music():
                 await ctx.respond("재생목록을 발견했습니다. 추가할 방법을 선택해주세요.", view=view)
 
         else:
+            if "?si=" in url:
+                url = url.split("?si=")[0]
             await self.queue(ctx, url)
 
     async def command_skip(self, ctx):

@@ -8,6 +8,7 @@ from datetime import datetime
 from traceback import format_exception
 from dotenv import load_dotenv
 import os
+import requests
 
 load_dotenv()
 # test
@@ -35,6 +36,23 @@ async def on_ready():
     game = discord.Game("오류 수집")
     await app.change_presence(status=discord.Status.dnd, activity=game)
     change_status.start()
+    korea_discord_bot_list.start()
+
+@tasks.loop(minutes=5)
+async def korea_discord_bot_list():
+    
+    url = f'https://koreanbots.dev/api/v2/bots/{app.user.id}/stats'
+    headers = {
+        'Authorization': os.getenv('KOREA_DISCORD_BOT_LIST_TOKEN'),
+        'Content-Type' : 'application/json'
+    }
+    data = {
+        'servers': len(app.guilds),
+        'shards': 1
+    }
+    response = requests.post(url, headers=headers, json=data)
+
+
 
 @tasks.loop(seconds=10)
 async def change_status():
@@ -66,6 +84,19 @@ async def edit_status(ctx, *, result):
     global playing_default
     if int(ctx.author.id) == authorId:
         playing_default = result
+
+@app.command(name="도움말", description="봇 명령어를 확인합니다.")
+async def help(ctx):
+    embed = discord.Embed(title="도움말", description="명령어 목록입니다.", color=0x00ff56)
+    embed.add_field(name="/도움말", value="명령어 목록을 확인합니다.", inline=False)
+    embed.add_field(name="/정보", value="봇 정보를 확인합니다.", inline=False)
+    embed.add_field(name="/재생 [검색어_또는_url]", value="음악을 재생합니다.", inline=False)
+    embed.add_field(name="/스킵", value="음악을 건너뜁니다.", inline=False)
+    embed.add_field(name="/볼륨 [0-100]", value="볼륨을 조절합니다.", inline=False)
+    embed.add_field(name="/정지", value="노래 정지 후 음성 채널에서 봇을 퇴장시킵니다.", 
+    inline=False)
+    embed.add_field(name="/예약목록", value="예약된 음악 목록을 확인합니다.", inline=False)
+    await ctx.respond(embed=embed)
 
 @app.command(name="정보", description="봇 정보를 확인합니다.")
 async def info(ctx):
@@ -121,6 +152,9 @@ async def on_application_command_error(ctx, error):
                 await ctx.send(embed=embed)
             else:
                 await ctx.respond(embed=embed)
+            embed.add_field(name="명령어", value=str(ctx.command.qualified_name) + " " + str(ctx.selected_options), inline=False)
+            user = await app.fetch_user(authorId)
+            await user.send(embed=embed)
         else:
             embed = discord.Embed(title="오류!!", description="오류가 발생했습니다.", color=0xFF0000)
             embed.add_field(name="상세", value=f"```{format_exception(type(error), error, error.__traceback__)}```", inline=False)
