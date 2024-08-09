@@ -1,8 +1,10 @@
 from typing import Dict
+from discord import Embed
 from discord.ext import commands
 from discord.commands import slash_command, Option
 from utils.error import CustomError
 from utils.music import Music
+from utils.view import ErrorVoiceClientJoin
 
 guilds = {} # type: Dict[int, Music]
 
@@ -46,7 +48,8 @@ class Core(commands.Cog, name="뮤직봇"):
         if not guilds.get(ctx.guild.id):
             guilds[ctx.guild.id] = Music(self.app, self.loop)
 
-        await guilds[ctx.guild.id].command_play(ctx, url)
+        if ctx.author.voice:
+            await guilds[ctx.guild.id].command_play(ctx, url)
 
 
     @slash_command(name="스킵", description="음악을 건너뜁니다.")
@@ -82,7 +85,10 @@ class Core(commands.Cog, name="뮤직봇"):
                 await channel.connect()  # 채널 연결
                 await ctx.send("봇이 음성채널에 입장했습니다.", delete_after=5)
         else:  # 유저가 채널에 없으면
-            raise CustomError("음성채널에 연결되지 않았습니다.")  # 출력
+            if ctx.response.is_done():
+                await ctx.send(embed=ErrorVoiceClientJoin.embed(), view=ErrorVoiceClientJoin.view())
+            else:
+                await ctx.respond(embed=ErrorVoiceClientJoin.embed(), view=ErrorVoiceClientJoin.view())
     # @commands.Cog.listener()
     # async def check_guilds(self, ctx):
     #     if not guilds.get(ctx.guild.id):

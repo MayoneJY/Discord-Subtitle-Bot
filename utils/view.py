@@ -2,6 +2,19 @@ from discord.ui import Select, View, Button
 from discord.ui.button import ButtonStyle
 from discord import Embed
 
+class ErrorVoiceClientJoin():
+    def embed():
+        embed = Embed(color=0xFE676E)
+        embed.add_field(name="오류 발생", value="음성 채널에 먼저 들어가주세요.")
+
+        return embed
+    
+    def view():
+        view = View(timeout=None)
+        view.add_item(Button(label="서포트 서버에서 질문하기", url="https://discord.gg/xNceqkSKan"))
+
+        return view
+
 class ListView(View):
     def __init__(self, ctx, music, url):
         super().__init__(timeout=None)

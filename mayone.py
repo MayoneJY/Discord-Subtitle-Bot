@@ -148,10 +148,13 @@ async def on_application_command_error(ctx, error):
         if "CustomError: " in str(error) :
             embed = discord.Embed(color=0xFE676E)
             embed.add_field(name="오류 발생", value=f"{str(error).split('CustomError: ')[1]}")
+
+            view = discord.ui.View(timeout=None)
+            view.add_item(discord.ui.Button(label="서포트 서버에서 질문하기", url="https://discord.gg/xNceqkSKan"))
             if ctx.response.is_done():
-                await ctx.send(embed=embed)
+                await ctx.send(embed=embed, view=view)
             else:
-                await ctx.respond(embed=embed)
+                await ctx.respond(embed=embed, view=view)
             embed.add_field(name="명령어", value=str(ctx.command.qualified_name) + " " + str(ctx.selected_options), inline=False)
             user = await app.fetch_user(authorId)
             await user.send(embed=embed)
